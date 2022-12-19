@@ -1,0 +1,18 @@
+package ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands;
+
+public enum SBCOpCode {
+	NOP,//0
+	RETURN,//1
+	SET_VISGROUP,//2
+	MATRIX_CONSTANT,//3
+	APPLY_MATERIAL,//4
+	DRAW_MESH,//5
+	MATRIX_JOINT,//6
+	MATRIX_BILLBOARD_XYZ,//7
+	MATRIX_BILLBOARD_Y,//8
+	MATRIX_SMOOTH_SKINNING,//9
+	EXEC_FIFO_QUEUE,//a
+	SCALE_GLOBAL,//b
+	TEX_MATRIX_SPHERE_MAP,//c
+	TEX_MATRIX_PROJECTION_MAP;//d
+}

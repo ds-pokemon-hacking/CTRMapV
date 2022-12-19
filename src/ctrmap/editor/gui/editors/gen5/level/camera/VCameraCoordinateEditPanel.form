@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="yaw1Label" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
+                          <Component id="pitch1Label" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="pitch" alignment="0" min="-2" pref="130" max="-2" attributes="0"/>
+                          <Component id="yaw" alignment="0" min="-2" pref="130" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="pitch1deg" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="yaw1deg" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="camTgtOffLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="camTgtOff" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="plrDist1Label" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="plrDist" alignment="0" min="-2" pref="160" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="fov" min="-2" pref="130" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="fov1Deg" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="fov1Label" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace pref="45" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="pitch1Label" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="pitch" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="pitch1deg" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="yaw1Label" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="yaw" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="yaw1deg" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="plrDist1Label" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fov1Label" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="plrDist" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fov" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fov1Deg" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="camTgtOffLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="camTgtOff" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="fov1Deg">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xb0;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="plrDist">
+      <Properties>
+        <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+          <Format format="#0.00" subtype="-1" type="0"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="plrDist1Label">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Distance from player"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="fov">
+      <Properties>
+        <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+          <Format format="#0.00" subtype="-1" type="0"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="yaw1deg">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xb0;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="pitch1deg">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xb0;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="fov1Label">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="FOV"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="yaw">
+      <Properties>
+        <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+          <Format format="#0.00" subtype="-1" type="0"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="yaw1Label">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Yaw"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="pitch">
+      <Properties>
+        <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+          <Format format="#0.00" subtype="-1" type="0"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="pitch1Label">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Pitch"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="camTgtOffLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Camera target offset"/>
+      </Properties>
+    </Component>
+    <Component class="xstandard.gui.components.Vec3fEditor" name="camTgtOff">
+    </Component>
+  </SubComponents>
+</Form>

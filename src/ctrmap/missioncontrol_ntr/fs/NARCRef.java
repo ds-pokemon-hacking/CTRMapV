@@ -1,0 +1,135 @@
+package ctrmap.missioncontrol_ntr.fs;
+
+import ctrmap.formats.common.GameInfo;
+
+public enum NARCRef {
+
+	MSGDATA_SYSTEM(2, 2),
+	MSGDATA_SCRIPT(3, 3),
+	PML_G2D_POKE_SPRITE(4, 4),
+	PML_G2D_POKE_ICON(7, 7),
+	FIELD_MAP_CHUNKS(8, 8),
+	FIELD_MAP_MATRIX(9, 9),
+	FIELD_MAP_REPLACE_TABLE(10, 10),
+	BATTLE_GRAPHICS(11, 11),
+	FIELD_ZONE_DATA(12, 12),
+	FIELD_AREA_DATA(13, 13),
+	FIELD_MAP_TEX(14, 14),
+	FIELD_ENV_EDGE_COLOR_TABLES(15, 15),
+	PML_PERSONAL(16, 16),
+	PML_GROWTBL(17, 17),
+	PML_LEARNSETS(18, 18),
+	PML_EVOLUTION(19, 19),
+	PML_BABYMONS(20, 20),
+	PML_MOVE(21, 21),
+	COMMON_FONT(-1, 23),
+	PML_ITEM(-1, 24),
+	PML_G2D_ITEM_ICON(-1, 25),
+	PASS_POWER_INFO(-1, 37),
+	FIELD_MMODEL_INDEX(48, 47),
+	FIELD_MMODEL_RES(49, 48),
+	FIELD_G2D_SUBSCREEN_STATUS(-1, 49),
+	FIELD_G2D_FRIENDLY_SHOP(-1, 53),
+	FIELD_SCRIPTS(57, 56),
+	FIELD_MMODEL_CACHES(58, 57),
+	FIELD_CAMERA_DEFAULTS(60, 59),
+	FIELD_ENV_LIGHTS(61, 60),
+	BATTLE_LIGHTS(62, 61),
+	FIELD_MAP_ANM_SRT(69, 68),
+	FIELD_MAP_ANM_PAT(70, 69),
+	TRAINER_G2D_BTL_F(-1, 71),
+	TRAINER_G2D_BTL_B(-1, 72),
+	FIELD_MAP_EFFECTS(-1, 74),
+	FIELD_RAIL_DATA(79, 78),
+	FIELD_CAMERA_AREA_NOGRID(80, 79),
+	FIELD_ENV_FOG(81, 80),
+	COMMON_LIGHTS(82, 81),
+	FIELD_G2D_PLACE_NAME(-1, 83),
+	ISS_BGM_INFO(87, 86),
+	TRAINER_MESSAGE_MAP(-1, 89),
+	TRAINER_MESSAGE_INDEX(-1, 90),
+	TRAINER_DATA(92, 91),
+	TRAINER_POKEMON(93, 92),
+	FIELD_ZONE_WEATHER_CALENDAR(97, 96),
+	FIELD_ZONE_GIMMICK_INDEX(101, 102),
+	FIELD_CAMERA_BOUNDARIES(108, 109),
+	FIELD_ZONE_NOGRID_HEADERS(109, 110),
+	FIELD_3DCI_EFFECT_G3D(-1, 116),
+	FIELD_3DCI_EFFECT_G3D_INFO(-1, 118),
+	FIELD_ZONE_ENTITIES(125, 126),
+	FIELD_ZONE_ENCOUNTERS(126, 127),
+	FIELD_G3DOBJ_TUBELINE_BRIDGE(-1, 128),
+	FIELD_G2D_Y_MENU(-1, 129),
+	ISS_CITY_DATA(134, 133),
+	ISS_ZONE_DATA(137, 136),
+	ISS_DUNGEON_DATA(147, 146),
+	ISS_SWITCH_DATA(148, 147),
+	FIELD_ZONE_FLASH_INDEX(149, 149),
+	FIELD_G2D_SEASON_BANNER(-1, 150),
+	FIELD_G3DOBJ_LEAGUE_LIFT(-1, 155),
+	FIELD_CAMERA_AREA_GRID(158, 156),
+	DEMO3D_RESOURCE(-1, 158),
+	FIELD_CAMERA_SCRIPT_COORDS(161, 162),
+	FIELD_MMODEL_MAT_COLOR_PRESETS(-1, 173),
+	FIELD_BMODEL_TEX_EXT(176, 174),
+	FIELD_BMODEL_TEX_INT(177, 175),
+	ISS_3D_SOUND_DATA(183, 182),
+	FIELD_G2D_SAVE_ICON(-1, 197),
+	FIELD_MMODEL_ANIM_CURVE(-1, 200),
+	FIELD_MMODEL_PM_LOOKUP(211, 208),
+	COMMON_PROFANITY_CHECK(221, 216),
+	FIELD_ENV_LUMINANCE_TABLES(-1, 219),
+	CDEMO_GF_LOGO(-1, 220),
+	CDEMO_OPENING_WB(-1, 221),
+	CDEMO_OPENING_SWAN(-1, 222),
+	FIELD_BMODEL_BUNDLE_EXT(229, 225),
+	FIELD_BMODEL_BUNDLE_INT(230, 226),
+	MEDAL_INFO(-1, 235),
+	FIELD_3DCI_EFFECT_G2D(-1, 267),
+	FIELD_3DCI_EFFECT_G2D_INFO(-1, 268),
+	FIELD_G3DOBJ_MARINE_TUBE(-1, 295),
+	DEX_HABITAT_LISTS(-1, 296);
+
+	private final int idBW;
+	private final int idBW2;
+
+	private NARCRef(int idBW, int idBW2) {
+		this.idBW = idBW;
+		this.idBW2 = idBW2;
+	}
+
+	public int getARCID(GameInfo gm) {
+		return gm.isBW2() ? idBW2 : idBW;
+	}
+
+	public static String arcIdToPath(int arcId) {
+		StringBuilder path = new StringBuilder();
+		path.append("a/");
+		String id = String.valueOf(arcId);
+		String digits = ("000" + id).substring(id.length());
+		path.append(digits.charAt(0));
+		path.append("/");
+		path.append(digits.charAt(1));
+		path.append("/");
+		path.append(digits.charAt(2));
+		return path.toString();
+	}
+
+	public static NARCRef getByName(String name) {
+		for (NARCRef r : values()) {
+			if (r.toString().equals(name)) {
+				return r;
+			}
+		}
+		return null;
+	}
+
+	public static NARCRef getByARCID(int arcId, GameInfo game) {
+		for (NARCRef r : values()) {
+			if (r.getARCID(game) == arcId) {
+				return r;
+			}
+		}
+		return null;
+	}
+}
