@@ -18,8 +18,8 @@ public class FieldActorCamera extends Camera {
 	}
 
 	@Override
-	public Matrix4 getProjectionMatrix() {
-		Matrix4 mat = super.getProjectionMatrix();
+	public Matrix4 getProjectionMatrix(Matrix4 dest) {
+		Matrix4 mat = super.getProjectionMatrix(dest);
 		//projMatrix.M32 += (projMatrix.M22 * (__int64)(int)field->ObjectProjMatrixOffset + 2048) >> 12;
 		mat.m32(mat.m32() + mat.m22() * frustumZOffset);
 		return mat;

@@ -35,8 +35,6 @@ import ctrmap.formats.ntr.nitrowriter.nsbta.NSBTAWriter;
 import ctrmap.formats.ntr.nitrowriter.nsbtx.NSBTXWriter;
 import ctrmap.formats.ntr.nitrowriter.nsbva.NSBVAWriter;
 import ctrmap.formats.pokemon.gen5.gfbca.GFBCA;
-import ctrmap.formats.qos.g3d.GeminiModel;
-import ctrmap.formats.qos.g3d.GeminiScene;
 import ctrmap.renderer.scene.Camera;
 import ctrmap.renderer.scene.animation.camera.CameraAnimation;
 import ctrmap.renderer.scene.animation.camera.CameraBoneTransform;
@@ -60,8 +58,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import ctrmap.creativestudio.ngcs.rtldr.INGCSPlugin;
 import ctrmap.formats.common.FormatIOExConfig;
-import ctrmap.formats.shrek3.g3d.S3DGeometry;
-import ctrmap.formats.shrek3.g3d.S3DTextureInfo;
 
 public class Gen5NGCSPlugin implements INGCSPlugin {
 
@@ -344,59 +340,10 @@ public class Gen5NGCSPlugin implements INGCSPlugin {
 		}
 	};
 
-	public static final IG3DFormatHandler GEMINI_MODEL = new DefaultG3DImportOnlyFormatHandler(GeminiModel.EXTENSION_FILTER) {
-		@Override
-		public boolean detectInternals(FormatDetectorInput input) {
-			return input.magic4int == 0xE5B66C3D;
-		}
-
-		@Override
-		public G3DResource importFile(FSFile fsf, G3DIOProvider exData) {
-			return GeminiModel.fromFile(fsf).toGeneric(fsf.getParent());
-		}
-	};
-
-	public static final IG3DFormatHandler GEMINI_SCENE = new DefaultG3DImportOnlyFormatHandler(GeminiScene.EXTENSION_FILTER) {
-		@Override
-		public boolean detectInternals(FormatDetectorInput input) {
-			return input.magic4int == 0xEB5AF13E;
-		}
-
-		@Override
-		public G3DResource importFile(FSFile fsf, G3DIOProvider exData) {
-			return GeminiScene.fromFile(fsf).toGeneric(fsf.getParent());
-		}
-	};
-
-	public static final IG3DFormatHandler S3D_TEXTUREINFO = new DefaultG3DImportOnlyFormatHandler(S3DTextureInfo.EXTENSION_FILTER) {
-		@Override
-		public boolean detectInternals(FormatDetectorInput input) {
-			return false;
-		}
-
-		@Override
-		public G3DResource importFile(FSFile fsf, G3DIOProvider exData) {
-			return S3DTextureInfo.fromFile(fsf).toGeneric(fsf.getParent());
-		}
-	};
-
-	public static final IG3DFormatHandler S3D_GEOMETRY = new DefaultG3DImportOnlyFormatHandler(S3DGeometry.EXTENSION_FILTER) {
-		@Override
-		public boolean detectInternals(FormatDetectorInput input) {
-			return false;
-		}
-
-		@Override
-		public G3DResource importFile(FSFile fsf, G3DIOProvider exData) {
-			return S3DGeometry.fromFile(fsf).toGeneric(fsf);
-		}
-	};
-
 	@Override
 	public void registerFormats(NGCSJulietIface j) {
-		j.registFormatSupport(CSG3DIOContentType.MULTI_EX, GEMINI_SCENE);
-		j.registFormatSupport(CSG3DIOContentType.MODEL, CSNNS_BMD, GEMINI_MODEL, S3D_GEOMETRY);
-		j.registFormatSupport(CSG3DIOContentType.TEXTURE, CSNNS_BTX, S3D_TEXTUREINFO);
+		j.registFormatSupport(CSG3DIOContentType.MODEL, CSNNS_BMD);
+		j.registFormatSupport(CSG3DIOContentType.TEXTURE, CSNNS_BTX);
 		j.registFormatSupport(CSG3DIOContentType.ANIMATION_SKL, CSNNS_BCA, GFBCA_SKELETAL);
 		j.registFormatSupport(CSG3DIOContentType.ANIMATION_CAM, GFBCA_CAMERA);
 		j.registFormatSupport(CSG3DIOContentType.ANIMATION_CURVE_SKL, GFBCA_SKELETAL_TRANSFORM);

@@ -26,15 +26,15 @@ public class VMapSamplerUtil {
 		switch (t.heightType) {
 			case PLAIN:
 				heightOffset = 0f;
-				dest.heightDiv = 1f;
-				dest.slopeX = 0f;
-				dest.slopeZ = 0f;
+				dest.slopeCos = 1f;
+				dest.slopeSinX = 0f;
+				dest.slopeSinZ = 0f;
 				break;
 			case DEFAULT:
 				heightOffset = VMapHeightTable.getHeightOffset(t.height);
-				dest.slopeX = VMapHeightTable.getSlopeX(t.slope);
-				dest.slopeZ = -VMapHeightTable.getSlopeZ(t.slope);
-				dest.heightDiv = VMapHeightTable.getSlopeHeightDiv(t.slope);
+				dest.slopeSinX = VMapHeightTable.getSlopeSinX(t.slope);
+				dest.slopeSinZ = -VMapHeightTable.getSlopeSinZ(t.slope);
+				dest.slopeCos = VMapHeightTable.getSlopeCos(t.slope);
 				break;
 			case CORNER:
 				VMapTerrain.CornerHeight corner = terrain.corners.get(t.height);
@@ -47,21 +47,21 @@ public class VMapSamplerUtil {
 				}
 				int slopeIndex = corner1 ? corner.slope1 : corner.slope2;
 				int heightOffsIndex = corner1 ? corner.height1 : corner.height2;
-				dest.slopeX = VMapHeightTable.getSlopeX(slopeIndex);
-				dest.slopeZ = -VMapHeightTable.getSlopeZ(slopeIndex);
-				dest.heightDiv = VMapHeightTable.getSlopeHeightDiv(slopeIndex);
 				heightOffset = VMapHeightTable.getHeightOffset(heightOffsIndex);
+				dest.slopeSinX = VMapHeightTable.getSlopeSinX(slopeIndex);
+				dest.slopeSinZ = -VMapHeightTable.getSlopeSinZ(slopeIndex);
+				dest.slopeCos = VMapHeightTable.getSlopeCos(slopeIndex);
 				break;
 		}
 		
 		dest.tileType = new VMapTerrain.TileType(t.type.getBits() & 0xFFFFFFFE);
-		dest.heightY = chunkY + -(dest.slopeX * relPosX + dest.slopeZ * relPosZ + heightOffset) / dest.heightDiv;
+		dest.heightY = chunkY + -(dest.slopeSinX * relPosX + dest.slopeSinZ * relPosZ + heightOffset) / dest.slopeCos;
 	}
 	
 	public static class MapTerrainBuf {
-		public float slopeX;
-		public float slopeZ;
-		public float heightDiv;
+		public float slopeSinX;
+		public float slopeSinZ;
+		public float slopeCos;
 		
 		public VMapTerrain.TileType tileType;
 		

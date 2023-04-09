@@ -37,30 +37,28 @@ public class RJsplit {
 				s = s.replace(".", "");
 				lines.add(0, j + " " + s);
 				try {
-					Files.write(Paths.get("D:\\Work\\AloyzEE", stripAccents(j + " " + s + ".txt")), lines, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+					Files.write(Paths.get("D:\\Work\\AloyzEE\\hamlet\\", stripAccents(j + " " + s + ".txt")), lines, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 				} catch (IOException ex) {
 					Logger.getLogger(RJsplit.class.getName()).log(Level.SEVERE, null, ex);
 				}
 			}
-			lines.clear();
 		}
+		lines.clear();
 	}
 
 	public static void main(String[] args) {
-		Scanner s = new Scanner(new DiskFile("D:\\Work\\AloyzEE\\romeo_a_julie.txt").getNativeInputStream());
+		Scanner s = new Scanner(new DiskFile("D:\\Work\\AloyzEE\\hamlet.txt").getNativeInputStream());
 		String jednani = null;
 		String scena = null;
 		List<String> curLines = new ArrayList<>();
 		while (s.hasNextLine()) {
 			String line = s.nextLine().trim();
 			if (!line.isEmpty()) {
-				if (line.contains("JEDNÁNÍ")) {
+				if (line.contains("JEDNÁNÍ") || line.contains("JEDNÁNI")) {
 					flush(curLines, jednani, scena);
 					jednani = line;
-				} else if (line.contains("Scena")) {
-					if (scena != null) {
-						flush(curLines, jednani, scena);
-					}
+				} else if (line.contains("Scéna") || line.contains("Scena")) {
+					flush(curLines, jednani, scena);
 					scena = line;
 				} else {
 					curLines.add(line);

@@ -48,14 +48,6 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>VicariousInflater</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>jar</target>
-                <clean-target>clean</clean-target>
-                <id>jar</id>
-            </reference>
-            <reference>
                 <foreign-project>XStandard</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
