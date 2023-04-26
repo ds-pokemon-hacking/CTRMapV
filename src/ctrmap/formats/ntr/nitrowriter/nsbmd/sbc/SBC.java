@@ -6,6 +6,7 @@ import ctrmap.formats.ntr.nitrowriter.nsbmd.dl.NitroMeshResource;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.mat.NitroMaterialResource;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.EndSBC;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.MaterialApply;
+import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.MtxStackLoad;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.VisGroupApply;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.PosScaleMul;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.RendererCommand;
@@ -48,6 +49,8 @@ public class SBC {
 			}
 		}
 
+		boolean lastMeshModifiesMtx = false;
+
 		for (int i = 0; i < Math.min(255, shapes.size()); i++) {
 			NitroMeshResource shape = shapes.get(i);
 			if (SBC_DEBUG) {
@@ -58,8 +61,7 @@ public class SBC {
 			int visGroupNo = 0;
 			if (settings.jointsAsVisGroups) {
 				visGroupNo = shape.isSingleJointRgdSk() ? shape.getSingleJointRgdSkJntNo() : 0;
-			}
-			else {
+			} else {
 				visGroupNo = shape.visGroup;
 			}
 
@@ -75,10 +77,16 @@ public class SBC {
 				addCommand(new VisGroupApply(visGroupNo, true));
 			}
 
-			if (trk.hasNonLoadedJBs()) {
+			JointBinding mainJointBinding = new JointBinding(shape.getSingleJointRgdSkJntNo());
+			boolean isMainJointNewlyLoaded = !trk.isJBLoaded(mainJointBinding);
+
+			if (lastMeshModifiesMtx || trk.hasNonLoadedJBs()) {
 				wasMtxRegisterUsed = true;
+			}
+			if (trk.hasNonLoadedJBs()) {
 				trk.addToSBC(this);
 			}
+			lastMeshModifiesMtx = shape.modifiesMatrixReg();
 			mtxStackTop = Math.max(mtxStackTop, trk.getMaxIdx());
 
 			currentVisGroup = visGroupNo;
@@ -87,7 +95,10 @@ public class SBC {
 			//This could be to scale back the current matrix to an object matrix loaded to the register before
 			//IMO this is a very minor optimization that only frees up one matrix stack index.
 			//Since we partly have the stack structure decided when we generate the display lists, I don't think I'll be implementing this functionality.
-			if (wasMtxRegisterUsed) {
+			if (wasMtxRegisterUsed && shape.isSingleJointRgdSk()) {
+				if (!isMainJointNewlyLoaded) {
+					addCommand(new MtxStackLoad(trk.getJBIndexForLoading(mainJointBinding)));
+				}
 				addCommand(new PosScaleMul(false));
 			}
 
@@ -105,8 +116,8 @@ public class SBC {
 			//Shape
 			addCommand(new ShapeDraw(i));
 		}
-		
-		if (shapes.size() > 255){
+
+		if (shapes.size() > 255) {
 			System.err.println("WARNING: Shape count over 255. Ignored " + (shapes.size() - 255) + " shapes.");
 		}
 

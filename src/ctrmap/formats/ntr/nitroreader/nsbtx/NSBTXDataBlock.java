@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import ctrmap.formats.ntr.nitroreader.nsbtx.info.NSBTXHeader;
 import ctrmap.renderer.scene.Scene;
+import ctrmap.renderer.scene.metadata.ReservedMetaData;
 import ctrmap.renderer.scene.texturing.Material;
 import ctrmap.renderer.scene.texturing.Texture;
 import ctrmap.renderer.scenegraph.G3DResource;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,15 +84,24 @@ public class NSBTXDataBlock {
 
 	public G3DResource toGeneric(List<Material> genericMaterials) {
 		G3DResource res = new G3DResource();
+		Map<String, Texture> outTextures = new HashMap<>();
 		for (Material mat : genericMaterials) {
 			if (!mat.textures.isEmpty()) {
 				String pltMetaName = String.format(NSBMDMaterial.NNS_METADATA_PALETTE_NAME_FORMAT, mat.textures.get(0).textureName);
 				if (mat.metaData.hasValue(pltMetaName)) {
 					Texture tex = getConvTexture(mat.textures.get(0).textureName, mat.metaData.getValue(pltMetaName).stringValue());
 					if (tex != null) {
-						res.addTexture(tex);
+						outTextures.put(tex.name, tex);
 					}
 				}
+			}
+		}
+		
+		//Preserve order in NSBTX as well as the output resource
+		for (int i = 0; i < textures.size(); i++) {
+			Texture tex = outTextures.get(textures.get(i).name);
+			if (tex != null) {
+				res.addTexture(tex);
 			}
 		}
 
@@ -167,6 +179,10 @@ public class NSBTXDataBlock {
 		else if (palette != null) {
 			paletteColors = palette.colors;
 		}
-		return tex.decode(paletteColors);
+		Texture out = tex.decode(paletteColors);
+		if (palette != null) {
+			out.metaData.putValue(ReservedMetaData.IDX_FORMAT_PALETTE_NAME, palette.name);
+		}
+		return out;
 	}
 }

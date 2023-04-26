@@ -69,8 +69,11 @@ public class NSBMDModelConverter extends AbstractGECommandProcessor {
 			jointWeights[i] = new FloatList();
 		}
 
+		Skeleton dummySkeleton = new Skeleton();
 		for (NSBMDJoint n : mdl.joints) {
-			joints.add(n.toGeneric());
+			Joint j = n.toGeneric();
+			dummySkeleton.addJoint(j);
+			joints.add(j);
 		}
 	}
 

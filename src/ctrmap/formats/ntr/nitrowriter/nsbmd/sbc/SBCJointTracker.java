@@ -7,6 +7,7 @@ import ctrmap.formats.ntr.nitrowriter.nsbmd.dl.JointBinding;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.dl.NitroMeshResource;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.NodeMtxApply;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.NodeMtxBlendApply;
+import ctrmap.formats.ntr.nitrowriter.nsbmd.sbc.commands.PosScaleMul;
 import ctrmap.renderer.scene.model.Joint;
 import ctrmap.renderer.scene.model.Skeleton;
 import java.util.ArrayList;
@@ -114,10 +115,10 @@ public class SBCJointTracker {
 			}
 			if (jb.isRgdSk()) {
 				NodeMtxApply cmd = new NodeMtxApply();
-				//if (!isSingleJnt) {
+				if (!isSingleJnt || !isJBLastUsedHere(jb)) {
 					//If it IS a single joint binding, then it's pointless to store since the value remains in the register
 					cmd.dstMtx = jointMtxBindings.get(jb);
-				//}
+				}
 				String parentName = skl.getJoint(jb.jointIds[0]).parentName;
 				if (parentName != null) {
 					Joint parent = skl.getJoint(parentName);

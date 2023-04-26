@@ -7,13 +7,10 @@ import ctrmap.renderer.scene.metadata.ReservedMetaData;
 import ctrmap.renderer.scene.texturing.Texture;
 import ctrmap.renderer.util.texture.TextureProcessor;
 import xstandard.io.base.impl.ext.data.DataIOStream;
-import xstandard.io.util.IOUtils;
 import xstandard.io.util.BitWriter;
 import xstandard.math.vec.RGBA;
 import xstandard.util.ArraysEx;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import xstandard.io.util.BitConverter;
 
 public class GETextureConverter {
@@ -41,7 +37,7 @@ public class GETextureConverter {
 				return convertTexture(new GETCInput(tex, GETextureFormat.RGB5A1), log);
 			case REDUCED_COLOR:
 				GETCInput in = new GETCInput(tex, GETextureFormat.NULL);
-				short[] palette = getSortedUniqueColors5A1(in.colors);
+				short[] palette = getSortedUniqueColors5A1(in.colors, in.alphaChannel);
 				int[] alphas = TextureProcessor.getUniqueAlphaValues(in.alphaChannel);
 				in.outFormat = decideIndexedTexFormat(palette, alphas);
 
@@ -55,8 +51,8 @@ public class GETextureConverter {
 		byte[] rgba = tex.format.getRGBA(tex);
 
 		short[] colors = createRGB5A1(rgba);
-		short[] uniqueColors = getSortedUniqueColors5A1(colors);
 		short[] alphaChannel = TextureProcessor.getAlphaChannel(rgba);
+		short[] uniqueColors = getSortedUniqueColors5A1(colors, alphaChannel);
 
 		int[] alphas = TextureProcessor.getUniqueAlphaValues(alphaChannel);
 
@@ -208,11 +204,11 @@ public class GETextureConverter {
 			case IDX2:
 			case IDX4:
 			case IDX8:
-				if (input.alphaChannel != null) {
+				if (input.alphaChannel != null && !(input.outFormat == GETextureFormat.A3I5 || input.outFormat == GETextureFormat.A5I3)) {
 					int[] uniqueAlphaValues = TextureProcessor.getUniqueAlphaValues(input.alphaChannel);
 					isPaletteTransparent = !(uniqueAlphaValues.length == 1 && uniqueAlphaValues[0] == 255);
 				}
-				palette = makePaletteForZeroIdxTransparency(getSortedUniqueColors5A1(colors), isPaletteTransparent);
+				palette = makePaletteForZeroIdxTransparency(getSortedUniqueColors5A1(colors, input.alphaChannel), isPaletteTransparent);
 				if (palette.length > format.indexMax) {
 					if (format == GETextureFormat.A3I5) {
 						log.err("Can not export a non-bipolar alpha texture that has more than 32 colors ! ! - " + name + ", limiting palette...");
@@ -544,15 +540,18 @@ public class GETextureConverter {
 		return out;
 	}
 
-	public static int getUniqueColorCount(short[] colors) {
-		return getUniqueColors5A1(colors).length;
+	public static int getUniqueColorCount(short[] colors, short[] alphaChannel) {
+		return getUniqueColors5A1(colors, alphaChannel).length;
 	}
 
-	public static short[] getUniqueColors5A1(short[] rgb5a1) {
+	public static short[] getUniqueColors5A1(short[] rgb5a1, short[] alphaChannel) {
 		HashSet<Short> colors = new HashSet<>();
 
 		short rgb;
 		for (int i = 0; i < rgb5a1.length; i++) {
+			if (alphaChannel != null && (alphaChannel[i] == 0)) {
+				continue; //need precise alpha value to skip this
+			}
 			rgb = (short) (rgb5a1[i] & 0x7FFF);
 			if (!colors.contains(rgb)) {
 				colors.add(rgb);
@@ -562,9 +561,9 @@ public class GETextureConverter {
 		short[] arr = ArraysEx.asArrayS(new ArrayList<>(colors));
 		return arr;
 	}
-
-	public static short[] getSortedUniqueColors5A1(short[] rgb5a1) {
-		short[] arr = getUniqueColors5A1(rgb5a1);
+	
+	public static short[] getSortedUniqueColors5A1(short[] rgb5a1, short[] alphaChannel) {
+		short[] arr = getUniqueColors5A1(rgb5a1, alphaChannel);
 		Arrays.sort(arr);
 		return arr;
 	}

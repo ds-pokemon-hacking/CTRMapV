@@ -191,6 +191,12 @@ public class DLSubMesh {
 		}
 		return false;
 	}
+	
+	private static void addScaleCmd(GEDisplayList dl, Vec3f vec) {
+		if (vec.x != 1f || vec.y != 1f || vec.z != 1f) {
+			dl.addCommand(new MtxScale(vec));
+		}
+	}
 
 	public GEDisplayList createDisplayList() {
 		GEDisplayList dl = new GEDisplayList();
@@ -211,16 +217,15 @@ public class DLSubMesh {
 						System.out.println("loading matrix for joint " + binding.jointIds[0] + " from " + getJointMtxId(binding));
 					}
 					dl.addCommand(new MtxStkLoad(getJointMtxId(binding)));
-					dl.addCommand(new MtxScale(omniScaleVec));
+					addScaleCmd(dl, omniScaleVec);
 				} else {
 					getJointMtxId(binding); //only register the matrix in the stack - is assigned thru SBC
-					dl.addCommand(new MtxStkLoad(getJointMtxId(binding)));
-					dl.addCommand(new MtxScale(subMeshScaleVec));
+					addScaleCmd(dl, subMeshScaleVec);
 				}
 			}
 			else {
 				dl.addCommand(new MtxLoadIdentity());
-				dl.addCommand(new MtxScale(omniScaleVec));
+				addScaleCmd(dl, omniScaleVec);
 			}
 
 			for (SeparablePrimitive p : jointMesh.getValue()) {

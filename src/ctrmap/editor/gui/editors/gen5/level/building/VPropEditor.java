@@ -213,8 +213,8 @@ public class VPropEditor extends javax.swing.JPanel implements AbstractToolbarEd
         previewSep = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         bmSelect = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingSelectJList();
-        bmPreview = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingPreviewPanel();
         btnLaunchPRE = new javax.swing.JButton();
+        bmPreview = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingPreviewPanel();
 
         bldComboBox.setMaximumRowCount(25);
         bldComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -257,17 +257,6 @@ public class VPropEditor extends javax.swing.JPanel implements AbstractToolbarEd
         locRotSeparator.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jScrollPane1.setViewportView(bmSelect);
-
-        javax.swing.GroupLayout bmPreviewLayout = new javax.swing.GroupLayout(bmPreview);
-        bmPreview.setLayout(bmPreviewLayout);
-        bmPreviewLayout.setHorizontalGroup(
-            bmPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 246, Short.MAX_VALUE)
-        );
-        bmPreviewLayout.setVerticalGroup(
-            bmPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
 
         btnLaunchPRE.setText("Edit resource bundle");
         btnLaunchPRE.addActionListener(new java.awt.event.ActionListener() {
@@ -318,7 +307,7 @@ public class VPropEditor extends javax.swing.JPanel implements AbstractToolbarEd
                                 .addComponent(rotYLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(ry, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 102, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
@@ -339,7 +328,7 @@ public class VPropEditor extends javax.swing.JPanel implements AbstractToolbarEd
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLaunchPRE))
                     .addComponent(bmPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))

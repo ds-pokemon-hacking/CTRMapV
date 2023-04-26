@@ -203,7 +203,9 @@ public class NewBMDialog extends javax.swing.JDialog {
 
 		if (modelFile != null) {
 			G3DResource rsc = G3DIO.readFile(modelFile, null, NGCSIOManager.getInstance().getFormatHandlers(CSG3DIOContentType.MODEL));
-			loadModel(rsc);
+			if (rsc != null) {
+				loadModel(rsc);
+			}
 		}
     }//GEN-LAST:event_btnImportMdlActionPerformed
 

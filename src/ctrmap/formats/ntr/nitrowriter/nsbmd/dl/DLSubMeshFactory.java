@@ -4,6 +4,7 @@ import ctrmap.formats.ntr.nitrowriter.nsbmd.NSBMDExportSettings;
 import ctrmap.formats.ntr.nitrowriter.nsbmd.mat.NitroMaterialResource;
 import ctrmap.renderer.scene.model.Face;
 import ctrmap.renderer.scene.model.Mesh;
+import ctrmap.renderer.scene.model.Model;
 import ctrmap.renderer.scene.model.Skeleton;
 import ctrmap.renderer.scene.model.Vertex;
 import ctrmap.renderer.scene.texturing.Texture;
@@ -32,11 +33,11 @@ public class DLSubMeshFactory {
 
 	private NSBMDExportSettings settings;
 
-	public DLSubMeshFactory(List<Mesh> meshes, NSBMDExportSettings settings) {
-		this(meshes, settings, -1);
+	public DLSubMeshFactory(Model mdl, List<Mesh> meshes, NSBMDExportSettings settings) {
+		this(mdl, meshes, settings, -1);
 	}
 
-	public DLSubMeshFactory(List<Mesh> meshes, NSBMDExportSettings settings, int forcedJointIdx) {
+	public DLSubMeshFactory(Model mdl, List<Mesh> meshes, NSBMDExportSettings settings, int forcedJointIdx) {
 		this.settings = settings;
 		for (int i = 0; i < meshes.size(); i++) {
 			Mesh mesh = meshes.get(i);
@@ -72,7 +73,7 @@ public class DLSubMeshFactory {
 
 		for (Mesh mesh : meshes) {
 			for (Face face : mesh.faces()) {
-				int visGroupIndex = mesh.parentModel.visGroups.indexOf(mesh.parentModel.getVisGroupByName(mesh.visGroupName));
+				int visGroupIndex = mdl.visGroups.indexOf(mdl.getVisGroupByName(mesh.visGroupName));
 				if (visGroupIndex == -1) {
 					visGroupIndex = 0;
 				}

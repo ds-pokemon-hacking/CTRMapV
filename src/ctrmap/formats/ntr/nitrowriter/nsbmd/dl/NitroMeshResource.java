@@ -77,6 +77,25 @@ public class NitroMeshResource extends PatriciaTreeNode {
 		}
 		return 0;
 	}
+	
+	public boolean modifiesMatrixReg() {
+		for (GECommand cmd : displayList) {
+			switch (cmd.getOpCode()) {
+				case MTX_POP:
+				case MTX_LOAD_4X3:
+				case MTX_LOAD_4X4:
+				case MTX_LOAD_IDENTITY:
+				case MTX_MULT_3x3:
+				case MTX_MULT_4X3:
+				case MTX_MULT_4X4:
+				case MTX_RESTORE:
+				case MTX_SCALE:
+				case MTX_TRANSLATE:
+					return true;
+			}
+		}
+		return false;
+	}
 
 	public int getDLFlags() {
 		int flags = 0;

@@ -162,10 +162,10 @@ public class NitroModelResource extends NNSG3DResource {
 					j.position = meshCenter;
 					j.position.sub(modelCenter);
 
-					smFactory = new DLSubMeshFactory(inMeshList, settings, skeleton.getJointCount());
+					smFactory = new DLSubMeshFactory(model, inMeshList, settings, skeleton.getJointCount());
 					skeleton.addJoint(j);
 				} else {
-					smFactory = new DLSubMeshFactory(inMeshList, settings);
+					smFactory = new DLSubMeshFactory(model, inMeshList, settings);
 				}
 
 				Texture tex = null;

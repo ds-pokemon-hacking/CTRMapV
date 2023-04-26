@@ -338,7 +338,6 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 
         mainListSP = new javax.swing.JScrollPane();
         mainBMList = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingSelectJList();
-        bmPreview = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingPreviewPanel();
         bmAnmControl = new ctrmap.util.gui.AnimationControl();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -372,6 +371,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
         btnClearAnm = new javax.swing.JButton();
         btnAddRemoveBM = new xstandard.gui.components.PlusMinusButtonSet();
         btnOpenMdlCS = new javax.swing.JButton();
+        bmPreview = new ctrmap.editor.gui.editors.gen5.level.building.VBuildingPreviewPanel();
         menuBar = new javax.swing.JMenuBar();
         btnCommitMenu = new javax.swing.JMenu();
         btnCommitAB = new javax.swing.JMenuItem();
@@ -381,19 +381,6 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
         setTitle("AB Editor");
 
         mainListSP.setViewportView(mainBMList);
-
-        bmPreview.setAnmEnable(false);
-
-        javax.swing.GroupLayout bmPreviewLayout = new javax.swing.GroupLayout(bmPreview);
-        bmPreview.setLayout(bmPreviewLayout);
-        bmPreviewLayout.setHorizontalGroup(
-            bmPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        bmPreviewLayout.setVerticalGroup(
-            bmPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("AB Resource"));
 
@@ -481,12 +468,12 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnUnbindDoor)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 38, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -629,7 +616,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(anmSetBox, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnPlaySelectAnm)
@@ -706,8 +693,8 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                         .addComponent(btnOpenMdlCS)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bmPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bmAnmControl, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE))
+                    .addComponent(bmAnmControl, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .addComponent(bmPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -717,7 +704,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(bmPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bmAnmControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -775,7 +762,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 				bmTextures.addTextures(cs.getTextures());
 				List<Model> ngcsModels = cs.getModels();
 				if (!ngcsModels.isEmpty() && bmRsc != null) {
-					System.out.println("repl model");
+					System.out.println("repl model with " + ngcsModels.get(0).name);
 					bmRsc.models.clear();
 					bmRsc.models.add(ngcsModels.get(0));
 					System.out.println(ngcsModels.get(0).meshes.size());

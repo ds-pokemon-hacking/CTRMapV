@@ -1,6 +1,7 @@
 package ctrmap.formats.ntr.nitroreader.nsbmd;
 
 import ctrmap.formats.ntr.common.NTRDataIOStream;
+import ctrmap.formats.ntr.common.gfx.commands.GECommand;
 import ctrmap.formats.ntr.common.gfx.commands.GEDisplayList;
 import ctrmap.renderer.scene.model.Mesh;
 import java.io.IOException;
