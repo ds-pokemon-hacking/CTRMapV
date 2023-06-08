@@ -27,9 +27,10 @@
           <Component id="headerSeparator" alignment="0" max="32767" attributes="0"/>
           <Component id="previewSeparator" alignment="0" max="32767" attributes="0"/>
           <Component id="footerSeparator" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="modelPreview" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
                       <Component id="bmImportUIDLabel" min="-2" max="-2" attributes="0"/>
@@ -38,11 +39,14 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="uidInfoMsg" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="modelPreview" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="mdlNameLabel" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnImportMdl" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="btnDoImport" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -50,10 +54,6 @@
                           <Component id="importAsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="173" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="btnDoImport" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -68,7 +68,7 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="headerSeparator" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="modelPreview" min="-2" max="-2" attributes="0"/>
+              <Component id="modelPreview" min="-2" pref="216" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="mdlNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -104,21 +104,6 @@
     </Component>
     <Component class="javax.swing.JSeparator" name="headerSeparator">
     </Component>
-    <Container class="ctrmap.editor.gui.editors.common.components.Custom3DPreview" name="modelPreview">
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="216" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-    </Container>
     <Component class="javax.swing.JLabel" name="mdlNameLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="- No model loaded -"/>
@@ -166,6 +151,8 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="&lt;N/A&gt;"/>
       </Properties>
+    </Component>
+    <Component class="ctrmap.editor.gui.editors.common.components.Custom3DPreview" name="modelPreview">
     </Component>
   </SubComponents>
 </Form>

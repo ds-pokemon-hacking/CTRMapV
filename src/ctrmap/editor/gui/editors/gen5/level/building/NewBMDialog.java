@@ -81,7 +81,6 @@ public class NewBMDialog extends javax.swing.JDialog {
 
         headingText = new javax.swing.JLabel();
         headerSeparator = new javax.swing.JSeparator();
-        modelPreview = new ctrmap.editor.gui.editors.common.components.Custom3DPreview();
         mdlNameLabel = new javax.swing.JLabel();
         btnImportMdl = new javax.swing.JButton();
         previewSeparator = new javax.swing.JSeparator();
@@ -91,23 +90,13 @@ public class NewBMDialog extends javax.swing.JDialog {
         footerSeparator = new javax.swing.JSeparator();
         btnDoImport = new javax.swing.JButton();
         uidInfoMsg = new javax.swing.JLabel();
+        modelPreview = new ctrmap.editor.gui.editors.common.components.Custom3DPreview();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Add a static prop resource");
 
         headingText.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         headingText.setText("Add a static prop resource");
-
-        javax.swing.GroupLayout modelPreviewLayout = new javax.swing.GroupLayout(modelPreview);
-        modelPreview.setLayout(modelPreviewLayout);
-        modelPreviewLayout.setHorizontalGroup(
-            modelPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        modelPreviewLayout.setVerticalGroup(
-            modelPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 216, Short.MAX_VALUE)
-        );
 
         mdlNameLabel.setText("- No model loaded -");
 
@@ -144,6 +133,7 @@ public class NewBMDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(modelPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(bmImportUIDLabel)
@@ -151,19 +141,18 @@ public class NewBMDialog extends javax.swing.JDialog {
                         .addComponent(bmImportUID, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(uidInfoMsg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(modelPreview, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(mdlNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImportMdl))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnDoImport))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(headingText)
                             .addComponent(importAsLabel))
-                        .addGap(0, 173, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnDoImport)))
+                        .addGap(0, 173, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -174,7 +163,7 @@ public class NewBMDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(headerSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(modelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(modelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(mdlNameLabel)

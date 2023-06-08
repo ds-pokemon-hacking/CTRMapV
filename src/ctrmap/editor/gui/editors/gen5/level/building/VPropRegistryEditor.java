@@ -97,7 +97,8 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 		public void actionPerformedImpl(ActionEvent e) {
 			AreaBuildingResource r = getSelectedBm();
 			if (r != null) {
-				switch (AnmSetLayout.values()[anmSetMode.getSelectedIndex()]) {
+				AnmSetLayout lyt = AnmSetLayout.values()[anmSetMode.getSelectedIndex()];
+				switch (lyt) {
 					case _1XN:
 						r.condenseAnimations();
 						r.anmSetEntryCount = r.getPresentAnimationCount();
@@ -115,6 +116,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 						r.anmSetEntryCount = 2;
 						break;
 				}
+				buildAnmSetBox(lyt);
 				loadAnmSet();
 			}
 		}
@@ -283,9 +285,15 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 	}
 
 	private void buildAnmSetBox() {
+		buildAnmSetBox(null);
+	}
+	
+	private void buildAnmSetBox(AnmSetLayout lyt) {
 		AreaBuildingResource r = getSelectedBm();
 		if (r != null) {
-			AnmSetLayout lyt = AnmSetLayout.detect(r);
+			if (lyt == null) {
+				lyt = AnmSetLayout.detect(r);
+			}
 			int count = lyt.getSetCount(r);
 			while (anmSetBox.getItemCount() > count) {
 				anmSetBox.removeItemAt(anmSetBox.getItemCount() - 1);
@@ -473,7 +481,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnUnbindDoor)
-                        .addGap(0, 38, Short.MAX_VALUE)))
+                        .addGap(0, 26, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -616,7 +624,7 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(anmSetBox, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnPlaySelectAnm)
@@ -644,9 +652,9 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -869,15 +877,15 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 			FSFile fsf = XFileDialog.openFileDialog(DAE.EXTENSION_FILTER, SMD.EXTENSION_FILTER, AnimeUtil.SA_EXTENSION_FILTER, AnimeUtil.MA_EXTENSION_FILTER);
 
 			if (fsf != null) {
-				System.out.println("file");
+				//System.out.println("file");
 				G3DResource res = G3DIO.readFile(fsf, null, NGCSIOManager.getInstance().getFormatHandlers(CSG3DIOContentType.ANIMATION_ANY_RESERVED));
 
 				if (res != null) {
-					System.out.println("got res");
+					//System.out.println("got res");
 					AbstractAnimation src = null;
 
 					List<AbstractAnimation> importAnmList = res.getAnimations();
-					System.out.println("anm count " + importAnmList.size());
+					//System.out.println("anm count " + importAnmList.size());
 					switch (importAnmList.size()) {
 						case 0:
 							break;
