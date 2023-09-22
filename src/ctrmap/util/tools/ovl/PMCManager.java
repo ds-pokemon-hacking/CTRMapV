@@ -13,10 +13,9 @@ import rpm.format.rpm.RPMSymbol;
 import rpm.util.AutoRelGenerator;
 import xstandard.fs.FSFile;
 import xstandard.io.base.impl.ext.data.DataIOStream;
-import xstandard.math.MathEx;
 
 public class PMCManager {
-	
+
 	private static final int PMC_OVERLAY_SIZE = 0x3000;
 	private static final String PMC_RPM_UID = "PMC.rpm";
 
@@ -28,7 +27,7 @@ public class PMCManager {
 		this.fs = fs;
 		esdb = genESDB(fs);
 	}
-	
+
 	private static ExternalSymbolDB genESDB(NTRGameFS fs) {
 		ExternalSymbolDB esdb = new ExternalSymbolDB();
 		int id = 0;
@@ -50,20 +49,12 @@ public class PMCManager {
 			if (overlayId == -1) {
 				OverlayTable ovlTable = fs.getARM9OverlayTable();
 				overlayId = ovlTable.overlays.size();
-				
-				/*baseAddress = fs.getARM9LoadAddr() + fs.getDecompressedArm9BinMaybeRO().length();
-				for (OverlayTable.OverlayInfo info : ovlTable.overlays) {
-					int end = info.mountAddress + info.mountSize + info.bssSize;
-					if (end > baseAddress) {
-						baseAddress = end;
-					}
-				}*/
-				baseAddress = 0x021FD0C0; //fixed at the moment since we have yet to adjust the symbols within the patch that actually notify the game of this
-				
+
+				baseAddress = CodeInjectionSystem.getMaxOvlAddrFromTable(ovlTable);
+
 				writePMCOverlayId(overlayId);
 				isNew = true;
-			}
-			else {
+			} else {
 				baseAddress = fs.getOvlLoadAddr(overlayId);
 			}
 			System.out.println("PMCManager init @ overlay " + overlayId + " | Base address 0x" + Integer.toHexString(baseAddress) + ", buffer size 0x" + Integer.toHexString(PMC_OVERLAY_SIZE));
@@ -82,21 +73,29 @@ public class PMCManager {
 		cis.queueRPMPatch(pmcRPM, PMC_RPM_UID);
 		cis.savePSysData();
 	}
-	
+
 	private void setOverlaySizeToPMC(RPM pmcRPM) {
 		RPMSymbol symb = pmcRPM.getSymbol("FULL_COPY_ARM9_0x0207B41C_ResizeMemoryForOvl344");
+		if (symb == null) {
+			for (RPMSymbol s : pmcRPM.symbols) {
+				if (s.name != null && s.name.endsWith("AdjustHeapStart")) {
+					symb = s;
+					break;
+				}
+			}
+		}
+
 		if (symb != null) {
 			try {
 				DataIOStream code = pmcRPM.getCodeStream();
 				code.seekUnbased(symb.address);
-				int heapStart = MathEx.padInteger(0x021FD0C0 + fs.getARM9OverlayTable().getOverlayInfo(getPMCOverlayId()).mountSize, 0x4);
+				int heapStart = cis.getMaxOvlAddr();
 				code.writeInt(heapStart);
 				System.out.println("Set system heap start to 0x" + Integer.toHexString(heapStart));
 			} catch (IOException ex) {
 				Logger.getLogger(PMCManager.class.getName()).log(Level.SEVERE, null, ex);
 			}
-		}
-		else {
+		} else {
 			System.err.println("Could not find overlay size symbol in PMC!");
 		}
 	}

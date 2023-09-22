@@ -74,6 +74,10 @@ public class CodeInjectionSystem implements RPMExternalRelocator, RPMSplitManage
 	}
 
 	public int getMaxOvlAddr() {
+		return getMaxOvlAddrFromTable(ovlTable);
+	}
+	
+	public static int getMaxOvlAddrFromTable(OverlayTable ovlTable) {
 		int max = 0;
 		for (OverlayTable.OverlayInfo i : ovlTable.overlays) {
 			if ((i.mountAddress & 0xFFF00000) <= 0x02300000) {
