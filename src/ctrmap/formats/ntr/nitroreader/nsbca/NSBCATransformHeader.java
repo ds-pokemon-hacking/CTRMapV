@@ -14,6 +14,8 @@ import java.io.IOException;
 import xstandard.util.EnumBitflagsInt;
 
 public class NSBCATransformHeader {
+	
+	public int jointId;
 
 	public boolean isBindPoseS;
 	public boolean isBindPoseR;
@@ -49,8 +51,13 @@ public class NSBCATransformHeader {
 	}
 
 	public NSBCATransformHeader(NTRDataIOStream in) throws IOException {
-		EnumBitflagsInt<NSBCATransformFlag> flags = new EnumBitflagsInt(NSBCATransformFlag.class, in.readInt());
+		int header = in.readInt();
+		jointId = header >>> 24;
+		EnumBitflagsInt<NSBCATransformFlag> flags = new EnumBitflagsInt(NSBCATransformFlag.class, header & 0xFFFFFF);
 		if (!flags.isSet(NSBCATransformFlag.IDENTITY)) {
+			isBindPoseS = flags.isSet(NSBCATransformFlag.BIND_POSE_S);
+			isBindPoseR = flags.isSet(NSBCATransformFlag.BIND_POSE_R);
+			isBindPoseT = flags.isSet(NSBCATransformFlag.BIND_POSE_T);
 			if (!flags.isSetAny(NSBCATransformFlag.BIND_POSE_T, NSBCATransformFlag.IDENTITY_T)) {
 				tx = getJointAnmTrans(in, flags.isSet(NSBCATransformFlag.CONST_TX));
 				ty = getJointAnmTrans(in, flags.isSet(NSBCATransformFlag.CONST_TY));

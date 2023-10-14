@@ -9,6 +9,9 @@ import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.tra.TranslationTrack;
  *
  */
 public class BakedTransform {
+	
+	public int jointId;
+	
 	public boolean nonexistent = false;
 	
 	public ScaleTrack sx;
@@ -18,6 +21,10 @@ public class BakedTransform {
 	public TranslationTrack tx;
 	public TranslationTrack ty;
 	public TranslationTrack tz;
+	
+	public BakedTransform(int jointId) {
+		this.jointId = jointId;
+	}
 	
 	public boolean isBindR(){
 		return nonexistent || rotation.isBindPose;

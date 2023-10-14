@@ -17,7 +17,7 @@ public class Rot3x3CompactElem implements RotationElement {
 	private short fx_m10;
 	private short fx_m11;
 
-	private short fx_m12;
+	public short fx_m12;
 
 	private Matrix3f mat_debug;
 
@@ -41,10 +41,10 @@ public class Rot3x3CompactElem implements RotationElement {
 	@Override
 	public void write(DataOutput out) throws IOException {
 		short _4 = (short) (fx_m11 << 3 | ((fx_m12 >> 15) & 0b111)); //Signum of m12
-		short _3 = (short) (fx_m10 << 3 | ((fx_m12) & 0b111));
-		short _2 = (short) (fx_m02 << 3 | ((fx_m12 >>= 3) & 0b111));
-		short _1 = (short) (fx_m01 << 3 | ((fx_m12 >>= 3) & 0b111));
-		short _0 = (short) (fx_m00 << 3 | ((fx_m12 >> 3) & 0b111));
+		short _3 = (short) (fx_m10 << 3 | ((fx_m12 >> 0) & 0b111));
+		short _2 = (short) (fx_m02 << 3 | ((fx_m12 >> 3) & 0b111));
+		short _1 = (short) (fx_m01 << 3 | ((fx_m12 >> 6) & 0b111));
+		short _0 = (short) (fx_m00 << 3 | ((fx_m12 >> 9) & 0b111));
 
 		out.writeShort(_0);
 		out.writeShort(_1);

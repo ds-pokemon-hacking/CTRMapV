@@ -33,8 +33,7 @@ public class NSBCAAnimation implements INamed {
 		this.nodes = new ArrayList(jntCount);
 		for (Integer node_offset : nodeOffsets) {
 			data.seek(node_offset + JAC_offset);
-			List list = this.nodes;
-			list.add(new NSBCATransform(data, new NSBCATransformHeader(data), JAC_offset, mtx3Offset, mtx5Offset, frameCount));
+			nodes.add(new NSBCATransform(data, new NSBCATransformHeader(data), JAC_offset, mtx3Offset, mtx5Offset, frameCount));
 		}
 	}
 
@@ -44,8 +43,9 @@ public class NSBCAAnimation implements INamed {
 		anm.name = name;
 
 		for (int i = 0; i < nodes.size(); i++) {
-			SkeletalBoneTransform bt = nodes.get(i).toGeneric();
-			Joint j = skl.getJoint(i);
+			NSBCATransform transform = nodes.get(i);
+			SkeletalBoneTransform bt = transform.toGeneric();
+			Joint j = skl.getJoint(transform.header.jointId);
 			if (j != null) {
 				bt.name = j.name;
 				anm.bones.add(bt);

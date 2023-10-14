@@ -1,4 +1,5 @@
 package ctrmap.formats.ntr.nitrowriter.nsbca;
+
 import ctrmap.formats.ntr.nitrowriter.common.resources.NNSG3DResource;
 import ctrmap.formats.ntr.nitrowriter.common.settings.AnimationImportSettingsBase;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.SkeletalAnimationFlags;
@@ -40,16 +41,9 @@ public class JointAnimationResource extends NNSG3DResource {
 		frameCount = (short) (anm.getFrameCountMaxTime() * (importSettings.sampleRate / 30f));
 		for (Joint j : skl.getJoints()) {
 			SkeletalBoneTransform bt = (SkeletalBoneTransform) anm.getBoneTransform(j.name);
-			BakedTransform t;
-
-			if (bt == null) {
-				t = new BakedTransform();
-				t.nonexistent = true;
-			} else {
-				t = createBakedTransform(bt, j, frameCount, importSettings);
+			if (bt != null) {
+				transforms.add(createBakedTransform(bt, j, frameCount, importSettings));
 			}
-
-			transforms.add(t);
 		}
 	}
 
@@ -72,7 +66,7 @@ public class JointAnimationResource extends NNSG3DResource {
 		float csx = 0f;
 		float csy = 0f;
 		float csz = 0f;
-		
+
 		for (int i = 0; i <= fcount; i++) {
 			float frame = i / (settings.sampleRate / 30f);
 			SkeletalAnimationFrame f = bt.getFrame(frame, j, true);
@@ -110,13 +104,13 @@ public class JointAnimationResource extends NNSG3DResource {
 			tf.sy = isSyConst ? csy : f.sy.value;
 			tf.sz = isSzConst ? csz : f.sz.value;
 			tf.rotation = isRotConst ? constR : f.getRotationMatrix();
-			
+
 			f.free();
 
 			l.add(tf);
 		}
 
-		BakedTransform t = new BakedTransform();
+		BakedTransform t = new BakedTransform(j.getIndex());
 		t.rotation = new RotationTrack(l, isRotConst);
 		t.tx = new TranslationTrack(l, SkeletalTransformComponent.TX, isTxConst);
 		t.ty = new TranslationTrack(l, SkeletalTransformComponent.TY, isTyConst);
@@ -195,7 +189,7 @@ public class JointAnimationResource extends NNSG3DResource {
 				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Y, t.ty.isConstant);
 				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Z, t.tz.isConstant);
 			}
-			flags |= (i << 24);
+			flags |= (t.jointId << 24);
 
 			//Write header
 			nodeOffsets.get(i).setHere();
@@ -286,7 +280,7 @@ public class JointAnimationResource extends NNSG3DResource {
 					throw new NullPointerException("Bad rotation element class !?!?!?!?");
 				}
 				int index = elemList.indexOf(e);
-				if (index == -1){
+				if (index == -1) {
 					index = elemList.size();
 					elemList.add(e);
 				}

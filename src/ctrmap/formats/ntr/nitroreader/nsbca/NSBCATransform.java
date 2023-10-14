@@ -14,7 +14,7 @@ import org.joml.Matrix3f;
 
 public class NSBCATransform {
 
-	public NSBCATransformHeader tags;
+	public NSBCATransformHeader header;
 
 	public Matrix3f[] r;
 	public int rStep;
@@ -31,15 +31,15 @@ public class NSBCATransform {
 	public float[] tz;
 	public int tzStep;
 
-	public NSBCATransform(NTRDataIOStream data, NSBCATransformHeader tags, int JAC_offset, int ofsRot3, int ofsRot5, int numFrame) throws IOException {
-		this.tags = tags;
-		NSBCATranslationTrack tx = tags.tx;
-		NSBCATranslationTrack ty = tags.ty;
-		NSBCATranslationTrack tz = tags.tz;
-		NSBCARotationTrack r = tags.r;
-		NSBCAScaleTrack sx = tags.sx;
-		NSBCAScaleTrack sy = tags.sy;
-		NSBCAScaleTrack sz = tags.sz;
+	public NSBCATransform(NTRDataIOStream data, NSBCATransformHeader header, int JAC_offset, int ofsRot3, int ofsRot5, int numFrame) throws IOException {
+		this.header = header;
+		NSBCATranslationTrack tx = header.tx;
+		NSBCATranslationTrack ty = header.ty;
+		NSBCATranslationTrack tz = header.tz;
+		NSBCARotationTrack r = header.r;
+		NSBCAScaleTrack sx = header.sx;
+		NSBCAScaleTrack sy = header.sy;
+		NSBCAScaleTrack sz = header.sz;
 		this.tx = tx.getData(data, JAC_offset, numFrame);
 		this.ty = ty.getData(data, JAC_offset, numFrame);
 		this.tz = tz.getData(data, JAC_offset, numFrame);
@@ -59,19 +59,19 @@ public class NSBCATransform {
 	public SkeletalBoneTransform toGeneric() {
 		SkeletalBoneTransform bt = new SkeletalBoneTransform();
 
-		if (!tags.isBindPoseS) {
+		if (!header.isBindPoseS) {
 			copyKFL(sx, sxStep, bt.sx);
 			copyKFL(sy, syStep, bt.sy);
 			copyKFL(sz, szStep, bt.sz);
 		}
 
-		if (!tags.isBindPoseT) {
+		if (!header.isBindPoseT) {
 			copyKFL(tx, txStep, bt.tx);
 			copyKFL(ty, tyStep, bt.ty);
 			copyKFL(tz, tzStep, bt.tz);
 		}
 
-		if (!tags.isBindPoseR) {
+		if (!header.isBindPoseR) {
 			copyKFLAsMatrix(r, rStep, bt.rx, bt.ry, bt.rz);
 		}
 

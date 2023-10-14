@@ -114,7 +114,7 @@ public class SBCJointTracker {
 				System.out.println("Preparing joint " + jb.toString(skl));
 			}
 			if (jb.isRgdSk()) {
-				NodeMtxApply cmd = new NodeMtxApply();
+				NodeMtxApply cmd = new NodeMtxApply(jb.jointIds[0]);
 				if (!isSingleJnt || !isJBLastUsedHere(jb)) {
 					//If it IS a single joint binding, then it's pointless to store since the value remains in the register
 					cmd.dstMtx = jointMtxBindings.get(jb);
@@ -148,11 +148,9 @@ public class SBCJointTracker {
 							int pIdx = parentJntIdStack.pop();
 							JointBinding pJB = new JointBinding(pIdx);
 							if (!jointMtxBindings.containsKey(pJB)) {
-								NodeMtxApply pCmd = new NodeMtxApply();
-								pCmd.parentJntId = lastPIdx;
+								NodeMtxApply pCmd = new NodeMtxApply(pIdx, lastPIdx);
 								pCmd.dstMtx = dstMtx;
 								pCmd.srcMtx = lastExistingStkIdx;
-								pCmd.jntId = pIdx;
 								lastExistingStkIdx = pCmd.dstMtx;
 								sbc.addCommand(pCmd);
 								System.out.println("add setup command srcmtx " + pCmd.srcMtx + " jntid " + pCmd.jntId + " dstmtx " + pCmd.dstMtx);
@@ -173,7 +171,6 @@ public class SBCJointTracker {
 						}
 					}
 				}
-				cmd.jntId = jb.jointIds[0];
 				if (SBCJOINTTRACKER_DEBUG) {
 					System.out.println("joint " + cmd.jntId + " matrix registered at stack pos " + cmd.dstMtx);
 				}

@@ -10,6 +10,19 @@ public class NodeMtxApply extends RendererCommand {
 	
 	public int jntId;
 	public int parentJntId = 0;
+	
+	public NodeMtxApply(int jntId) {
+		this(jntId, jntId);
+		//There are no defined rules as far as I know to handle root bone IDs in this format
+		//However, the only time they are used are on the 1 forced root bone, which always has
+		//ID 0 and parent ID also 0. Thus I assume that if the ID=PID, it means that the bone does not have a
+		//parent.
+	}
+	
+	public NodeMtxApply(int jntId, int parentJntId) {
+		this.jntId = jntId;
+		this.parentJntId = parentJntId;
+	}
 
 	@Override
 	public SBCOpCode getOpCode() {

@@ -56,7 +56,7 @@ public abstract class NSBCARotationTrack {
 		final float m10 = FX.unfx16(_3 >> 3);
 		final float m11 = FX.unfx16(_4 >> 3);
 		final float m12 = FX.unfx16(
-			((_4 << 31) >> 20)
+			((_4 << 31) >> 19)
 			| ((_0 & 0b111) << 9)
 			| ((_1 & 0b111) << 6)
 			| ((_2 & 0b111) << 3)
