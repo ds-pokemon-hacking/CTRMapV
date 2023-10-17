@@ -10,7 +10,9 @@ import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.rot.elements.Rot3x3Compac
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.rot.elements.RotationElement;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.sca.ScaleTrack;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.SkeletalTransformComponent;
+import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.TransformTrack;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.tra.TranslationTrack;
+import ctrmap.renderer.scene.animation.KeyFrameList;
 import ctrmap.renderer.scene.animation.skeletal.SkeletalAnimation;
 import ctrmap.renderer.scene.animation.skeletal.SkeletalAnimationFrame;
 import ctrmap.renderer.scene.animation.skeletal.SkeletalBoneTransform;
@@ -122,26 +124,29 @@ public class JointAnimationResource extends NNSG3DResource {
 		if (bt.rx.isEmpty() && bt.ry.isEmpty() && bt.rz.isEmpty()) {
 			t.rotation.setIsBindPose();
 		}
-		if (bt.tx.isEmpty()) {
-			t.tx.setIsBindPose();
+		else if (constR != null && constR.equals(new Matrix3f())) {
+			t.rotation.setIsIdentity();
 		}
-		if (bt.ty.isEmpty()) {
-			t.ty.setIsBindPose();
-		}
-		if (bt.tz.isEmpty()) {
-			t.tz.setIsBindPose();
-		}
-		if (bt.sx.isEmpty()) {
-			t.sx.setIsBindPose();
-		}
-		if (bt.sy.isEmpty()) {
-			t.sy.setIsBindPose();
-		}
-		if (bt.sz.isEmpty()) {
-			t.sz.setIsBindPose();
-		}
+		
+		setBindOrIdentity(bt.tx, t.tx, 0f);
+		setBindOrIdentity(bt.ty, t.ty, 0f);
+		setBindOrIdentity(bt.tz, t.tz, 0f);
+		setBindOrIdentity(bt.sx, t.sx, 1f);
+		setBindOrIdentity(bt.sy, t.sy, 1f);
+		setBindOrIdentity(bt.sz, t.sz, 1f);
 
 		return t;
+	}
+	
+	private static void setBindOrIdentity(KeyFrameList kfl, TransformTrack track, float identityVal) {
+		if (kfl.isEmpty()) {
+			track.setIsBindPose();
+		}
+		else if (track.isConstant) {
+			if (kfl.get(0).value == identityVal) {
+				track.setIsIdentity();
+			}
+		}
 	}
 
 	public byte[] getJ0CABlock() throws IOException {
@@ -149,7 +154,8 @@ public class JointAnimationResource extends NNSG3DResource {
 		out.writeStringUnterminated(JAC_MAGIC);
 		out.writeShort(frameCount);
 		out.writeShort(transforms.size());
-		out.writeInt(0);
+		out.writeInt(0); //enables interpolation (half frames) - this seems to require slightly different data though
+		//note: arm9 0x20689DC
 		TemporaryOffset axisRotOffset = new TemporaryOffset(out);
 		TemporaryOffset m3x3RotOffset = new TemporaryOffset(out);
 
@@ -171,23 +177,32 @@ public class JointAnimationResource extends NNSG3DResource {
 		for (int i = 0; i < transforms.size(); i++) {
 			BakedTransform t = transforms.get(i);
 
-			int flags = 0;
-			flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_BIND_POSE, t.isBindS());
-			flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_BIND_POSE, t.isBindR());
-			flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_BIND_POSE, t.isBindT());
+			boolean allIdentity = t.isIdentityS() && t.isIdentityR() && t.isIdentityT();
 
-			if (!t.isBindS()) {
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_X, t.sx.isConstant);
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Y, t.sy.isConstant);
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Z, t.sz.isConstant);
-			}
-			if (!t.isBindR()) {
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_CONSTANT, t.rotation.isConstant);
-			}
-			if (!t.isBindT()) {
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_X, t.tx.isConstant);
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Y, t.ty.isConstant);
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Z, t.tz.isConstant);
+			int flags = 0;
+			flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY, allIdentity);
+			if (!allIdentity) {
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_S, t.isIdentityS());
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_R, t.isIdentityR());
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_T, t.isIdentityT());
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_BIND_POSE, t.isBindS());
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_BIND_POSE, t.isBindR());
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_BIND_POSE, t.isBindT());
+
+				//Files from pokemon W2 have these flags set even if the constant values are not written (identity/bind)
+				//if (!t.skipS()) {
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_X, t.sx.isConstant);
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Y, t.sy.isConstant);
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Z, t.sz.isConstant);
+				//}
+				//if (!t.skipR()) {
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_CONSTANT, t.rotation.isConstant);
+				//}
+				//if (!t.skipT()) {
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_X, t.tx.isConstant);
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Y, t.ty.isConstant);
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Z, t.tz.isConstant);
+				//}
 			}
 			flags |= (t.jointId << 24);
 
@@ -195,24 +210,26 @@ public class JointAnimationResource extends NNSG3DResource {
 			nodeOffsets.get(i).setHere();
 			out.writeInt(flags);
 
-			//Now write the actual transform in accordance with the header
-			if (!t.isBindT()) {
-				pendingTranslationData.put(writeTranslationTrack(out, t.tx), t.tx);
-				pendingTranslationData.put(writeTranslationTrack(out, t.ty), t.ty);
-				pendingTranslationData.put(writeTranslationTrack(out, t.tz), t.tz);
-			}
-			if (!t.isBindR()) {
-				if (t.rotation.isConstant) {
-					pendingConstantRotationData.put(new TemporaryValue(out), t.rotation);
-				} else {
-					out.writeInt(t.rotation.getInfo());
-					pendingVariableRotationData.put(new TemporaryOffset(out), t.rotation);
+			if (!allIdentity) {
+				//Now write the actual transform in accordance with the header
+				if (!t.skipT()) {
+					pendingTranslationData.put(writeTranslationTrack(out, t.tx), t.tx);
+					pendingTranslationData.put(writeTranslationTrack(out, t.ty), t.ty);
+					pendingTranslationData.put(writeTranslationTrack(out, t.tz), t.tz);
 				}
-			}
-			if (!t.isBindS()) {
-				pendingScaleData.put(writeScaleTrack(out, t.sx), t.sx);
-				pendingScaleData.put(writeScaleTrack(out, t.sy), t.sy);
-				pendingScaleData.put(writeScaleTrack(out, t.sz), t.sz);
+				if (!t.skipR()) {
+					if (t.rotation.isConstant) {
+						pendingConstantRotationData.put(new TemporaryValue(out), t.rotation);
+					} else {
+						out.writeInt(t.rotation.getInfo());
+						pendingVariableRotationData.put(new TemporaryOffset(out), t.rotation);
+					}
+				}
+				if (!t.skipS()) {
+					pendingScaleData.put(writeScaleTrack(out, t.sx), t.sx);
+					pendingScaleData.put(writeScaleTrack(out, t.sy), t.sy);
+					pendingScaleData.put(writeScaleTrack(out, t.sz), t.sz);
+				}
 			}
 		}
 

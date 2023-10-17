@@ -28,6 +28,12 @@ public abstract class TransformTrack {
 		isConstant = true;
 		isIdentity = false;
 	}
+	
+	public final void setIsIdentity() {
+		isBindPose = false;
+		isConstant = true;
+		isIdentity = true;
+	}
 
 	protected abstract int getInfoImpl();
 	

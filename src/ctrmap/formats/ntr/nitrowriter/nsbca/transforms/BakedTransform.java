@@ -37,4 +37,28 @@ public class BakedTransform {
 	public boolean isBindS(){
 		return nonexistent || (sx.isBindPose && sy.isBindPose && sz.isBindPose);
 	}
+	
+	public boolean isIdentityR() {
+		return rotation.isIdentity;
+	}
+	
+	public boolean isIdentityT() {
+		return tx.isIdentity && ty.isIdentity && tz.isIdentity;
+	}
+	
+	public boolean isIdentityS() {
+		return sx.isIdentity && sy.isIdentity && sz.isIdentity;
+	}
+	
+	public boolean skipS() {
+		return isBindS() || isIdentityS();
+	}
+	
+	public boolean skipR() {
+		return isBindR() || isIdentityR();
+	}
+	
+	public boolean skipT() {
+		return isBindT() || isIdentityT();
+	}
 }

@@ -55,7 +55,7 @@ public class ScaleTrack extends TransformTrack {
 	private static ScaleEncoder decideEncoder(List<TransformFrame> frames, SkeletalTransformComponent comp) {
 		for (TransformFrame f : frames) {
 			float val = f.getValueByComponent(comp);
-			if (Math.abs(val) > FX.FX16_MAX){
+			if (Math.abs(val) > FX.FX16_MAX || Math.abs(1f / val) > FX.FX16_MAX){
 				return new ScaFX32Encoder();
 			}
 		}
