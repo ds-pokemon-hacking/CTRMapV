@@ -57,7 +57,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JMenuItem;
 import ctrmap.creativestudio.ngcs.rtldr.INGCSPlugin;
+import ctrmap.creativestudio.nitroplugin.NSBCAExportDialog;
 import ctrmap.formats.common.FormatIOExConfig;
+import ctrmap.formats.ntr.nitrowriter.nsbca.NSBCAExportSettings;
 
 public class Gen5NGCSPlugin implements INGCSPlugin {
 
@@ -100,16 +102,41 @@ public class Gen5NGCSPlugin implements INGCSPlugin {
 		}
 	};
 
-	public static final IG3DFormatHandler CSNNS_BCA = new DefaultG3DFormatHandlerSklImEx(NSBCAWriter.EXTENSION_FILTER) {
+	public static final IG3DFormatHandler CSNNS_BCA = new IG3DFormatExHandler<FormatIOExConfig, NSBCAExportSettings>() {
 		@Override
-		public G3DResource importFile(FSFile source, G3DIOProvider exData) {
-			return new NSBCA(source).toGeneric(exData.getSkeleton());
+		public FormatIOExConfig popupImportExConfigDialog(Frame parent) {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public void exportResource(G3DResource res, FSFile target, G3DIOProvider exData) {
-			NSBCAWriter writer = new NSBCAWriter(exData.getSkeleton(), res.skeletalAnimations.toArray(new SkeletalAnimation[res.skeletalAnimations.size()]));
+		public NSBCAExportSettings popupExportExConfigDialog(Frame parent) {
+			return NSBCAExportDialog.getExportSettings(parent);
+		}
+
+		@Override
+		public G3DResource importFile(FSFile file, G3DIOProvider exData) {
+			return importFileEx(file, exData, null);
+		}
+
+		@Override
+		public G3DResource importFileEx(FSFile file, G3DIOProvider exData, FormatIOExConfig config) {
+			return new NSBCA(file).toGeneric(exData.getSkeleton());
+		}
+
+		@Override
+		public void exportResourceEx(G3DResource res, G3DIOProvider exData, FSFile target, NSBCAExportSettings config) {
+			NSBCAWriter writer = new NSBCAWriter(config, exData.getSkeleton(), res.skeletalAnimations.toArray(new SkeletalAnimation[res.skeletalAnimations.size()]));
 			writer.write(target);
+		}
+
+		@Override
+		public int getAttributes() {
+			return G3DFMT_IMPORT | G3DFMT_EXPORT | G3DFMT_EXPORT_HAS_EXCONFIG | G3DFMT_IMPORT_EXDATA_NEEDS_SKELETON | G3DFMT_EXPORT_EXDATA_NEEDS_SKELETON;
+		}
+
+		@Override
+		public ExtensionFilter getExtensionFilter() {
+			return NSBCAWriter.EXTENSION_FILTER;
 		}
 
 		@Override
@@ -432,12 +459,19 @@ public class Gen5NGCSPlugin implements INGCSPlugin {
 	private void csnns_ExportBCA(Frame uiParent, NGCSContentAccessor contentAccessor) {
 		Model skelMdl;
 		if ((skelMdl = contentAccessor.getSupplementaryModelForExport(true)) != null) {
-			FSFile f = XFileDialog.openSaveFileDialog(NSBCAWriter.EXTENSION_FILTER);
+			NSBCAExportDialog dialog = new NSBCAExportDialog(uiParent, true);
+			dialog.setVisible(true);
 
-			if (f != null) {
-				List<SkeletalAnimation> sklAnm = contentAccessor.getSklAnime();
+			NSBCAExportSettings settings = dialog.getResult();
 
-				new NSBCAWriter(skelMdl.skeleton, sklAnm.toArray(new SkeletalAnimation[sklAnm.size()])).write(f);
+			if (settings != null) {
+				FSFile f = XFileDialog.openSaveFileDialog(NSBCAWriter.EXTENSION_FILTER);
+
+				if (f != null) {
+					List<SkeletalAnimation> sklAnm = contentAccessor.getSklAnime();
+
+					new NSBCAWriter(settings, skelMdl.skeleton, sklAnm.toArray(new SkeletalAnimation[sklAnm.size()])).write(f);
+				}
 			}
 		}
 	}

@@ -10,8 +10,12 @@ public class NSBCAWriter extends NNSG3DWriter {
 	
 	public static final ExtensionFilter EXTENSION_FILTER = new ExtensionFilter("Nitro System Binary Character Animation", "*.nsbca");
 
-	public NSBCAWriter(Skeleton skl, SkeletalAnimation... anm) {
+	public NSBCAWriter(NSBCAExportSettings settings, Skeleton skl, SkeletalAnimation... anm) {
 		super("BCA0");
-		addBlock(new JNT0(skl, anm));
+		addBlock(new JNT0(settings, skl, anm));
+	}
+	
+	public NSBCAWriter(Skeleton skl, SkeletalAnimation... anm) {
+		this(new NSBCAExportSettings(), skl, anm);
 	}
 }

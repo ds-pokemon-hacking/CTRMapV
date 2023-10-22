@@ -1,7 +1,9 @@
 
 package ctrmap.formats.ntr.nitrowriter.common.settings;
 
-public class AnimationImportSettingsBase {
+import ctrmap.formats.common.FormatIOExConfig;
+
+public class NNSAnimExportSettingsBase implements FormatIOExConfig {
 	public final int sampleRate = 30;
 	public final int bakeRate = 1;
 }

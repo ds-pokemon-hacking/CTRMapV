@@ -12,6 +12,6 @@ public class ScaFX32Elem extends AbstractScaleElement {
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(value_fx);
-		out.writeInt(0);
+		out.writeInt(invValue_fx);
 	}
 }

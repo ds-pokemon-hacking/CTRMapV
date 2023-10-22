@@ -1,7 +1,6 @@
 package ctrmap.formats.ntr.nitrowriter.nsbca;
 
 import ctrmap.formats.ntr.nitrowriter.common.resources.NNSG3DResource;
-import ctrmap.formats.ntr.nitrowriter.common.settings.AnimationImportSettingsBase;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.SkeletalAnimationFlags;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.BakedTransform;
 import ctrmap.formats.ntr.nitrowriter.nsbca.transforms.TransformFrame;
@@ -38,18 +37,26 @@ public class JointAnimationResource extends NNSG3DResource {
 	private short frameCount;
 	private List<BakedTransform> transforms = new ArrayList<>();
 
-	public JointAnimationResource(SkeletalAnimation anm, Skeleton skl, AnimationImportSettingsBase importSettings) {
+	public JointAnimationResource(SkeletalAnimation anm, Skeleton skl, NSBCAExportSettings exportSettings) {
 		name = anm.name;
-		frameCount = (short) (anm.getFrameCountMaxTime() * (importSettings.sampleRate / 30f));
+		frameCount = (short) (anm.getFrameCountMaxTime() * (exportSettings.sampleRate / 30f));
 		for (Joint j : skl.getJoints()) {
 			SkeletalBoneTransform bt = (SkeletalBoneTransform) anm.getBoneTransform(j.name);
 			if (bt != null) {
-				transforms.add(createBakedTransform(bt, j, frameCount, importSettings));
+				transforms.add(createBakedTransform(bt, j, frameCount, exportSettings));
+			} else if (exportSettings.forceTargetAllJoints) {
+				transforms.add(createDummyTransform(j));
 			}
 		}
 	}
 
-	private static BakedTransform createBakedTransform(SkeletalBoneTransform bt, Joint j, short fcount, AnimationImportSettingsBase settings) {
+	private static BakedTransform createDummyTransform(Joint j) {
+		BakedTransform bt = new BakedTransform(j.getIndex());
+		bt.nonexistent = true;
+		return bt;
+	}
+
+	private static BakedTransform createBakedTransform(SkeletalBoneTransform bt, Joint j, short fcount, NSBCAExportSettings settings) {
 		boolean isRotConst = AnimeProcessor.checkConstant(bt.rx, bt.ry, bt.rz);
 		boolean isSxConst = AnimeProcessor.checkConstant(bt.sx);
 		boolean isSyConst = AnimeProcessor.checkConstant(bt.sy);
@@ -123,11 +130,10 @@ public class JointAnimationResource extends NNSG3DResource {
 
 		if (bt.rx.isEmpty() && bt.ry.isEmpty() && bt.rz.isEmpty()) {
 			t.rotation.setIsBindPose();
-		}
-		else if (constR != null && constR.equals(new Matrix3f())) {
+		} else if (constR != null && constR.equals(new Matrix3f())) {
 			t.rotation.setIsIdentity();
 		}
-		
+
 		setBindOrIdentity(bt.tx, t.tx, 0f);
 		setBindOrIdentity(bt.ty, t.ty, 0f);
 		setBindOrIdentity(bt.tz, t.tz, 0f);
@@ -137,12 +143,11 @@ public class JointAnimationResource extends NNSG3DResource {
 
 		return t;
 	}
-	
+
 	private static void setBindOrIdentity(KeyFrameList kfl, TransformTrack track, float identityVal) {
 		if (kfl.isEmpty()) {
 			track.setIsBindPose();
-		}
-		else if (track.isConstant) {
+		} else if (track.isConstant) {
 			if (kfl.get(0).value == identityVal) {
 				track.setIsIdentity();
 			}
@@ -176,33 +181,37 @@ public class JointAnimationResource extends NNSG3DResource {
 
 		for (int i = 0; i < transforms.size(); i++) {
 			BakedTransform t = transforms.get(i);
-
-			boolean allIdentity = t.isIdentityS() && t.isIdentityR() && t.isIdentityT();
-
+			
 			int flags = 0;
-			flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY, allIdentity);
-			if (!allIdentity) {
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_S, t.isIdentityS());
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_R, t.isIdentityR());
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_T, t.isIdentityT());
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_BIND_POSE, t.isBindS());
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_BIND_POSE, t.isBindR());
-				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_BIND_POSE, t.isBindT());
+			if (!t.nonexistent) {
+				boolean allIdentity = t.isIdentityS() && t.isIdentityR() && t.isIdentityT();
 
-				//Files from pokemon W2 have these flags set even if the constant values are not written (identity/bind)
-				//if (!t.skipS()) {
+				flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY, allIdentity);
+				if (!allIdentity) {
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_S, t.isIdentityS());
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_R, t.isIdentityR());
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_IDENTITY_T, t.isIdentityT());
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_BIND_POSE, t.isBindS());
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_BIND_POSE, t.isBindR());
+					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_BIND_POSE, t.isBindT());
+
+					//Files from pokemon W2 have these flags set even if the constant values are not written (identity/bind)
+					//if (!t.skipS()) {
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_X, t.sx.isConstant);
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Y, t.sy.isConstant);
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_SCALE_IS_CONSTANT_Z, t.sz.isConstant);
-				//}
-				//if (!t.skipR()) {
+					//}
+					//if (!t.skipR()) {
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_CONSTANT, t.rotation.isConstant);
-				//}
-				//if (!t.skipT()) {
+					//}
+					//if (!t.skipT()) {
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_X, t.tx.isConstant);
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Y, t.ty.isConstant);
 					flags = setFlagIf(flags, SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_CONSTANT_Z, t.tz.isConstant);
-				//}
+					//}
+				}
+			} else {
+				flags = SkeletalAnimationFlags.TRANSFORM_TRANSLATION_IS_BIND_POSE | SkeletalAnimationFlags.TRANSFORM_ROTATION_IS_BIND_POSE | SkeletalAnimationFlags.TRANSFORM_SCALE_IS_BIND_POSE;
 			}
 			flags |= (t.jointId << 24);
 
@@ -210,26 +219,24 @@ public class JointAnimationResource extends NNSG3DResource {
 			nodeOffsets.get(i).setHere();
 			out.writeInt(flags);
 
-			if (!allIdentity) {
-				//Now write the actual transform in accordance with the header
-				if (!t.skipT()) {
-					pendingTranslationData.put(writeTranslationTrack(out, t.tx), t.tx);
-					pendingTranslationData.put(writeTranslationTrack(out, t.ty), t.ty);
-					pendingTranslationData.put(writeTranslationTrack(out, t.tz), t.tz);
+			//Now write the actual transform in accordance with the header
+			if (!t.skipT()) {
+				pendingTranslationData.put(writeTranslationTrack(out, t.tx), t.tx);
+				pendingTranslationData.put(writeTranslationTrack(out, t.ty), t.ty);
+				pendingTranslationData.put(writeTranslationTrack(out, t.tz), t.tz);
+			}
+			if (!t.skipR()) {
+				if (t.rotation.isConstant) {
+					pendingConstantRotationData.put(new TemporaryValue(out), t.rotation);
+				} else {
+					out.writeInt(t.rotation.getInfo());
+					pendingVariableRotationData.put(new TemporaryOffset(out), t.rotation);
 				}
-				if (!t.skipR()) {
-					if (t.rotation.isConstant) {
-						pendingConstantRotationData.put(new TemporaryValue(out), t.rotation);
-					} else {
-						out.writeInt(t.rotation.getInfo());
-						pendingVariableRotationData.put(new TemporaryOffset(out), t.rotation);
-					}
-				}
-				if (!t.skipS()) {
-					pendingScaleData.put(writeScaleTrack(out, t.sx), t.sx);
-					pendingScaleData.put(writeScaleTrack(out, t.sy), t.sy);
-					pendingScaleData.put(writeScaleTrack(out, t.sz), t.sz);
-				}
+			}
+			if (!t.skipS()) {
+				pendingScaleData.put(writeScaleTrack(out, t.sx), t.sx);
+				pendingScaleData.put(writeScaleTrack(out, t.sy), t.sy);
+				pendingScaleData.put(writeScaleTrack(out, t.sz), t.sz);
 			}
 		}
 
