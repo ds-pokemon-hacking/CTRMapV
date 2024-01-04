@@ -323,8 +323,8 @@ public class VExtrasPanel extends javax.swing.JPanel implements AbstractTabbedEd
     }//GEN-LAST:event_btnDumpISSActionPerformed
 
     private void btnUpdatePMCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdatePMCActionPerformed
-		if (cm.getGame().getSubGame() != GameInfo.SubGame.W2) {
-			DialogUtils.showErrorMessage(cm, "Not supported", "Code injection is only supported on Pokémon White 2");
+		if (!cm.getGame().isBW2()) {
+			DialogUtils.showErrorMessage(cm, "Not supported", "Code injection is only supported on Pokémon Black 2/White 2");
 		} else {
 			FSFile file = XFileDialog.openFileDialog("Select the PMC static module RPM", RPM.EXTENSION_FILTER);
 			if (file != null && RPM.isRPM(file)) {

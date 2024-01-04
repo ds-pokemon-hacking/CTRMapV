@@ -893,7 +893,9 @@ public class VPropRegistryEditor extends javax.swing.JFrame {
 							src = importAnmList.get(0);
 							break;
 						default:
-							ComboSelectDialog dlg = new ComboSelectDialog(this, true, "Select one of the animations", importAnmList);
+							ComboSelectDialog<AbstractAnimation> dlg = new ComboSelectDialog<>(this, true, "Select one of the animations", importAnmList, (t) -> {
+								return t.getName();
+							});
 							dlg.setVisible(true);
 							src = (AbstractAnimation) dlg.getSelectedUserObj();
 							break;
