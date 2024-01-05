@@ -6,6 +6,7 @@ import xstandard.fs.FSFile;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import xstandard.io.base.iface.IOStream;
 
 public class NSBTX extends NNSG3DResource {
 
@@ -23,6 +24,10 @@ public class NSBTX extends NNSG3DResource {
 
 	public NSBTX(NTRDataIOStream reader) {
 		this(reader, false);
+	}
+	
+	public NSBTX(IOStream io) {
+		this(new NTRDataIOStream(io));
 	}
 
 	private NSBTX(NTRDataIOStream io, boolean close) {

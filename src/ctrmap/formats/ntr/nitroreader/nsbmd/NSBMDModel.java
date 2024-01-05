@@ -26,8 +26,8 @@ public class NSBMDModel implements INamed {
 
 	public String name;
 
-	private List<SBCCommand> commands;
-	private NSBMDModelHeader modelHeader;
+	public List<SBCCommand> commands;
+	public final NSBMDModelHeader modelHeader;
 	public List<NSBMDMaterial> materials;
 	public List<NSBMDJoint> joints;
 	public List<NSBMDMesh> meshes;
@@ -191,6 +191,7 @@ public class NSBMDModel implements INamed {
 		conv.matrixMode(MtxMode.GEMatrixMode.MODELVIEW_NORMAL);
 
 		for (SBCCommand sbc : commands) {
+			System.out.println(sbc);
 			sbc.toGeneric(conv);
 		}
 

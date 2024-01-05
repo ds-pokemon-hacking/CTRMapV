@@ -9,16 +9,24 @@ import xstandard.io.base.impl.ext.data.DataIOStream;
 public class NNSPatriciaTreeReader {
 
 	public static Entry[] readTree(DataInputEx in) throws IOException {
+		int treeStart = in.getPosition();
 		in.read();
 		int count = in.read();
-		in.skipBytes(10 + 4 * count);
+		int dataSize = in.readUnsignedShort();
+		//On FFIII Steam port models, this field is 0. thus we have to read the structure
+		//accurately as there is no tree present (was this allowed on the original format!?)
+		int nodesOffset = in.readUnsignedShort();
+		int entriesOffset = in.readUnsignedShort();
+		in.seekNext(treeStart + entriesOffset);
+		int entriesStart = in.getPosition();
 		int entrySize = in.readUnsignedShort();
 		int entryWordCount = entrySize >> 2;
-		in.skipBytes(2);
+		int namesOffset = in.readUnsignedShort();
 		Entry[] entries = new Entry[count];
 		for (int j = 0; j < count; j++) {
 			entries[j] = new Entry(in, entryWordCount);
 		}
+		in.seekNext(entriesStart + namesOffset);
 		for (int j = 0; j < count; j++) {
 			entries[j].name = in.readPaddedString(16);
 		}

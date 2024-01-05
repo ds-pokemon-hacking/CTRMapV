@@ -1,7 +1,6 @@
 package ctrmap.formats.ntr.nitroreader.nsbmd;
 
 import ctrmap.formats.ntr.common.NTRDataIOStream;
-import ctrmap.formats.ntr.common.gfx.commands.GECommand;
 import ctrmap.formats.ntr.common.gfx.commands.GEDisplayList;
 import ctrmap.renderer.scene.model.Mesh;
 import java.io.IOException;
@@ -14,7 +13,7 @@ public class NSBMDMesh {
 	public final boolean hasUV;
 
 	public String name;
-	GEDisplayList dl;
+	public GEDisplayList dl;
 
 	public NSBMDMesh(NTRDataIOStream data, String name) throws IOException {
 		data.setBaseHere();

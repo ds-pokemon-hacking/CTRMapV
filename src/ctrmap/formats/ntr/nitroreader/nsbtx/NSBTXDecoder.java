@@ -16,16 +16,27 @@ public class NSBTXDecoder {
 	private final int cmprTexOffset;
 	private final int texOffset;
 	private final int cmprIndexOffset;
+	
+	private final boolean isHackedFormat; //flag for detecting FF3 windows port hacked NSBTXs
 
-	public NSBTXDecoder(NTRDataIOStream data, NSBTXHeader textureInfo) throws IOException {
+	public NSBTXDecoder(NTRDataIOStream data, int texBlockSize, NSBTXHeader textureInfo) throws IOException {
 		if (textureInfo != null) {
 			texOffset = textureInfo.texHeader.imageOffset;
 			cmprTexOffset = textureInfo.compressedTexHeader.imageOffset;
 			cmprIndexOffset = textureInfo.compressedTexHeader.idxDataOffset;
+			int maxTexOffset = texBlockSize;
+			if (cmprTexOffset > texOffset) {
+				maxTexOffset = Math.min(maxTexOffset, cmprTexOffset);
+			}
+			if (textureInfo.paletteHeader.imageOffset > texOffset) {
+				maxTexOffset = Math.min(maxTexOffset, textureInfo.paletteHeader.imageOffset);
+			}
+			isHackedFormat = maxTexOffset > (0xFFFF << 3);
 		} else {
 			cmprTexOffset = -1;
 			texOffset = -1;
 			cmprIndexOffset = -1;
+			isHackedFormat = false;
 		}
 	}
 	
@@ -34,6 +45,18 @@ public class NSBTXDecoder {
 		int height = (texImageParam >> 23) & 7;
 		int width = (texImageParam >> 20) & 7;
 		int offset = (texImageParam & 0xFFFF) << 3;
+		int offsetFF3 = (texImageParam & 0xFFFFF) << 3;
+		
+		if (isHackedFormat) {
+			//FF3 can have the texture image size larger than the DS hardware maximum, in which case it is
+			//set to 0
+			
+			//workaround: FF3 steam release hacked the format to allow for
+			//"hd" textures by using the (normally masked out by materials) texture wrap bits
+			//for an offset. This wouldn't work very well on the DS hardware, but it does in the
+			//windows port.
+			offset = offsetFF3;
+		}
 
 		//System.out.println("tex " + name + " fmt " + format);
 		boolean hasAlpha = BitMath.checkIntegerBit(texImageParam, 29);

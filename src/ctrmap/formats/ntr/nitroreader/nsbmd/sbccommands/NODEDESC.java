@@ -46,7 +46,8 @@ public class NODEDESC extends SBCCommand {
 			throw new NullPointerException("Could not resolve joint " + jointId + " (Model " + conv.getModelName() + ")");
 		}
 
-		if (parentJointId != -1 && parentJointId != jointId) {
+		//Pokemon uses parentID=thisID, FFIII Steam models use 255 for root bone
+		if (parentJointId != 255 && parentJointId != jointId) {
 			Joint pJnt = conv.getJointById(parentJointId);
 			if (pJnt == null) {
 				System.err.println("Could not resolve joint ID " + parentJointId + "!!");

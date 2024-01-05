@@ -17,7 +17,6 @@ import ctrmap.renderer.scene.texturing.MaterialParams;
 import ctrmap.renderer.scene.texturing.TexEnvStage;
 import ctrmap.renderer.util.MaterialProcessor;
 import ctrmap.renderer.util.MeshProcessor;
-import ctrmap.renderer.util.ModelProcessor;
 import xstandard.math.vec.Matrix4;
 import xstandard.math.vec.RGBA;
 import xstandard.math.vec.Vec3f;

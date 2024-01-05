@@ -34,7 +34,7 @@ public class NSBTXDataBlock {
 		try {
 			in.setBaseHere();
 			String magic = in.readPaddedString(4);
-			long size = in.readInt();
+			int size = in.readInt();
 
 			NSBTXHeader info = new NSBTXHeader(in);
 			in.seek(info.texHeader.entriesOffset);
@@ -51,7 +51,7 @@ public class NSBTXDataBlock {
 				compPalette[i] = in.readShort(); //the compressed palette often overflows, needs to be read as a whole
 			}
 
-			NSBTXDecoder decoder = new NSBTXDecoder(in, info);
+			NSBTXDecoder decoder = new NSBTXDecoder(in, size, info);
 			for (NNSPatriciaTreeReader.Entry texHeader : texHeaders) {
 				textures.add(decoder.readTexture(in, texHeader.getName(), texHeader.getParam(0)));
 			}
