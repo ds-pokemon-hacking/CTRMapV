@@ -329,8 +329,28 @@ public class VExtrasPanel extends javax.swing.JPanel implements AbstractTabbedEd
 			FSFile file = XFileDialog.openFileDialog("Select the PMC static module RPM", RPM.EXTENSION_FILTER);
 			if (file != null && RPM.isRPM(file)) {
 				try {
-					pmc.updatePMC(new RPM(file));
-					cm.getProject().wsfs.getOvFSFile("data/patches").mkdirs();
+					RPM pmcRpm = new RPM(file);
+					if (!pmc.checkMinPMCVersion(pmcRpm)) {
+						DialogUtils.showErrorMessage(cm, "Obsolete version", "This version of PMC is no longer supported.\nPlease use at least version " + pmc.getMinPMCVersion() + ".");
+					} else {
+						if (!pmc.isUniversalInjectionCompatible()) {
+							if (!DialogUtils.showYesNoWarningDialog(cm, "Incompatible upgrade", 
+								"The version of PMC that is currently installed is not upgradeable to the one you are trying to install.\n"
+								+ "If you're sure you know what you are doing, I'm not going to hold you back, but be wary."
+								+ "\nDo you wish to continue anyway?")) {
+								return;
+							}
+						}
+						if (!pmc.isGameMatched(pmcRpm)) {
+							if (!DialogUtils.showYesNoWarningDialog(cm, "Incompatible game", 
+								"The RPM you are trying to install does not seem to be targeting " + cm.getGame().getSubGame().friendlyName + "."
+								+ "\nDo you wish to continue anyway?")) {
+								return;
+							}
+						}
+						pmc.updatePMC(pmcRpm);
+						cm.getProject().wsfs.getOvFSFile("data/patches").mkdirs();
+					}
 				} catch (Exception ex) {
 					DialogUtils.showExceptionTraceDialog(ex);
 				}
@@ -407,8 +427,7 @@ public class VExtrasPanel extends javax.swing.JPanel implements AbstractTabbedEd
 				FSFile lib = cm.getProject().wsfs.getFsFile("data/lib");
 				upgradeRPMExecDir(lib);
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			DialogUtils.showExceptionTraceDialog(ex);
 		}
     }//GEN-LAST:event_btnLibRPMUpgradeActionPerformed

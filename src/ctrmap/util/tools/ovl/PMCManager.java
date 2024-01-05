@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import rpm.elfconv.ESDBSegmentInfo;
 import rpm.elfconv.ExternalSymbolDB;
 import rpm.format.rpm.RPM;
+import rpm.format.rpm.RPMMetaData;
 import rpm.format.rpm.RPMSymbol;
 import rpm.util.AutoRelGenerator;
 import xstandard.fs.FSFile;
@@ -18,6 +19,9 @@ public class PMCManager {
 
 	private static final int PMC_OVERLAY_SIZE = 0x3000;
 	private static final String PMC_RPM_UID = "PMC.rpm";
+	private static final String PMC_VERSION_META = "PMCVersion";
+	private static final String PMC_GAME_ID_META = "PMCGameID";
+	private static final String PMC_UNIVERSAL_VERSION = "13.2.0";
 
 	private final NTRGameFS fs;
 	private CodeInjectionSystem cis;
@@ -123,5 +127,64 @@ public class PMCManager {
 
 		}
 		return -1;
+	}
+	
+	public String getPMCVersionString() {
+		return getPMCVersionString(getPMCRPM());
+	}
+	
+	public String getPMCVersionString(RPM pmcRpm) {
+		if (pmcRpm != null && pmcRpm.metaData != null) {
+			RPMMetaData.RPMMetaValue mv = pmcRpm.metaData.findValue(PMC_VERSION_META);
+			if (mv != null) {
+				return mv.stringValue();
+			}
+		}
+		return null;
+	}
+	
+	public boolean checkVersionOver(String version, String check) {
+		if (version == null) {
+			return check == null;
+		}
+		return version.compareTo(check) >= 0;
+	}
+	
+	public boolean isUniversalInjectionCompatible() {
+		ensureCIS();
+		if (getPMCRPM() == null) {
+			return true;
+		}
+		return checkVersionOver(getPMCVersionString(), PMC_UNIVERSAL_VERSION);
+	}
+	
+	public boolean isPMCRPMUniversal(RPM rpm) {
+		return checkVersionOver(getPMCVersionString(rpm), PMC_UNIVERSAL_VERSION);
+	}
+	
+	public boolean checkMinPMCVersion(RPM rpm) {
+		return checkVersionOver(getPMCVersionString(rpm), getMinPMCVersion());
+	}
+	
+	public String getMinPMCVersion() {
+		return PMC_UNIVERSAL_VERSION;
+	}
+	
+	public boolean isGameMatched(RPM rpm) {
+		if (rpm.metaData != null) {
+			RPMMetaData.RPMMetaValue mv = rpm.metaData.findValue(PMC_GAME_ID_META);
+			if (mv != null) {
+				return mv.stringValue().equals(fs.getGameInfo().getSubGame().name());
+			}
+		}
+		return false;
+	}
+	
+	private RPM getPMCRPM() {
+		OvlCodeEntry entry = cis.getPSys().getPatchByName(PMC_RPM_UID);
+		if (entry != null) {
+			return entry.getFullRPM();
+		}
+		return null;
 	}
 }
