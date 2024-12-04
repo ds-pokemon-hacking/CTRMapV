@@ -34,19 +34,22 @@ public class VTextLoader extends AbstractTextLoader {
 		}
 		return null;
 	}
-
+	
 	@Override
-	public ITextFile getTextFileData(ITextArcType type, int file) {
-		ArcType typeV = (ArcType) type;
-		
-		FSFile fsFile = getGameFS().NARCGet(getNARC(typeV), file);
-		
+	public FSFile getFileFromArc(ITextArcType type, int fileIndex) {
+		return getGameFS().NARCGet(getNARC((ArcType)type), fileIndex);
+	}
+	
+	@Override
+	public ITextFile loadFromFile(ITextArcType fileType, FSFile file) {
+		ArcType typeV = (ArcType) fileType;
+				
 		switch (typeV) {
 			case PROFANITY:
-				return new GFProfanityCheck(fsFile, getMsgHandler());
+				return new GFProfanityCheck(file, getMsgHandler());
 			case SCRIPT_MSG:
 			case SYSTEM_MSG:
-				return new TextFile(fsFile, getMsgHandler());
+				return new TextFile(file, getMsgHandler());
 		}
 		return null;
 	}
