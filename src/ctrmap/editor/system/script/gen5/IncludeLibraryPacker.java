@@ -15,7 +15,7 @@ import java.util.List;
 
 public class IncludeLibraryPacker {
 
-	private static final String REPOSITORY_ZIP_PATH = "https://github.com/HelloOO7/PokeScriptSDK5/archive/refs/heads/master.zip";
+	private static final String REPOSITORY_ZIP_PATH = "https://github.com/ds-pokemon-hacking/PokeScriptSDK5/archive/refs/heads/master.zip";
 
 	public static void main(String[] args) {
 		File tempFile = TempFileAccessor.createTempFile("IncludeLibraryZip.zip");
