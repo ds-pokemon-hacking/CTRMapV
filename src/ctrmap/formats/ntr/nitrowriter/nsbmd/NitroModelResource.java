@@ -193,7 +193,7 @@ public class NitroModelResource extends NNSG3DResource {
 				submeshFactories.add(smFactory);
 
 				int vertexAlpha;
-				if (!Nitroshader.isNshReady(material)) {
+				if (!Nitroshader.isNshMaterialAlphaUsed(material)) {
 					vertexAlpha = smFactory.getAvgVertexAlpha();
 				} else {
 					vertexAlpha = Nitroshader.getNshAlphaValue255(material);

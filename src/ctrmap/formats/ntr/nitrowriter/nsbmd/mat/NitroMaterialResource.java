@@ -2,6 +2,7 @@ package ctrmap.formats.ntr.nitrowriter.nsbmd.mat;
 
 import ctrmap.formats.ntr.nitrowriter.common.resources.NNSG3DResource;
 import ctrmap.formats.ntr.common.FX;
+import ctrmap.formats.ntr.common.gfx.Nitroshader;
 import ctrmap.formats.ntr.common.gfx.commands.mat.MatColDifAmbSet;
 import ctrmap.formats.ntr.common.gfx.commands.mat.MatColSpcEmiSet;
 import ctrmap.formats.ntr.common.gfx.commands.mat.MatTexImageParamSet;
@@ -54,6 +55,8 @@ public class NitroMaterialResource extends NNSG3DResource {
 	public MaterialParams.TestFunction depthFunction;
 	public MaterialParams.FaceCulling faceCulling;
 
+	public int polygonID;
+
 	public NitroMaterialResource(int index, Material mat, List<Texture> textures, int vertexAlpha) {
 		name = mat.name;
 		this.index = index;
@@ -89,6 +92,14 @@ public class NitroMaterialResource extends NNSG3DResource {
 
 		depthFunction = mat.depthColorMask.depthFunction;
 		faceCulling = mat.faceCulling;
+
+		if (Nitroshader.isNshStencilSchemeUsed(mat)) {
+			polygonID = mat.stencilTest.reference;
+		} else {
+			if (isXLU) {
+				polygonID = index & 31;
+			}
+		}
 
 		textureName = mapTexName;
 		paletteName = textureName;
@@ -154,9 +165,8 @@ public class NitroMaterialResource extends NNSG3DResource {
 		polyAttr.drawBackFace = faceCulling == MaterialParams.FaceCulling.NEVER || faceCulling == MaterialParams.FaceCulling.FRONT_FACE;
 		polyAttr.enableFog = enableFog;
 
-		if (isXLU) {
-			polyAttr.polygonId = index & 31;
-		}
+		polyAttr.polygonId = polygonID;
+
 		polyAttr.writeParams(out);
 
 		out.writeInt(0x3F1FF8FF); //constant again - exactly matches the unused bits in POLYGON_ATTR at GBATek

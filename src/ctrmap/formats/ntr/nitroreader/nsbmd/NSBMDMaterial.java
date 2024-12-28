@@ -2,6 +2,7 @@ package ctrmap.formats.ntr.nitroreader.nsbmd;
 
 import ctrmap.formats.ntr.common.NTRDataIOStream;
 import ctrmap.formats.ntr.common.gfx.GXColor;
+import ctrmap.formats.ntr.common.gfx.Nitroshader;
 import ctrmap.formats.ntr.nitroreader.common.Utils;
 import ctrmap.renderer.scene.texturing.Material;
 import ctrmap.renderer.scene.texturing.MaterialParams;
@@ -183,6 +184,8 @@ public class NSBMDMaterial {
 		mat.faceCulling = MaterialParams.FaceCulling.values()[faceCulling];
 
 		mat.fogEnabled = enableFog;
+		
+		Nitroshader.setNshStencilScheme(mat, polygonID);
 
 		if (textureName != null) {
 			mat.metaData.putValue(String.format(NNS_METADATA_PALETTE_NAME_FORMAT, textureName), paletteName);
