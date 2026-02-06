@@ -154,7 +154,10 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="includesSP" min="-2" pref="235" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="includeComboBox" min="-2" pref="320" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="includeComboBox" min="-2" pref="320" max="-2" attributes="0"/>
+                                  <Component id="includeBeforeLocalTypedefs" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                       <EmptySpace pref="280" max="32767" attributes="0"/>
@@ -173,9 +176,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="includeComboBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="includeBeforeLocalTypedefs" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="includesSP" pref="458" max="32767" attributes="0"/>
+                          <Component id="includesSP" pref="473" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -197,7 +202,7 @@
                     </Property>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SwanInclude&gt;"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -217,6 +222,11 @@
             <Component class="javax.swing.JLabel" name="includeListLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="List"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="includeBeforeLocalTypedefs">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Before local typedefs"/>
               </Properties>
             </Component>
           </SubComponents>

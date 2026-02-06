@@ -30,7 +30,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 public class SwanComposer extends javax.swing.JFrame {
 
 	private final ArrayListModel<SwanSourceFile> sourceFileListModel = new ArrayListModel<>();
-	private final ArrayListModel<String> includesListModel = new ArrayListModel<>();
+	private final ArrayListModel<SwanInclude> includesListModel = new ArrayListModel<>();
 	private final ArrayListModel<SwanTypedef> typedefListModel = new ArrayListModel<>();
 	private final ArrayListModel<SwanTypedef> gvarListModel = new ArrayListModel<>();
 	private final ArrayListModel<SwanEnum> enumListModel = new ArrayListModel<>();
@@ -108,22 +108,28 @@ public class SwanComposer extends javax.swing.JFrame {
 				loadIncludeEntry();
 			}
 		});
-
-		includeComboBox.addListener((selectedItem) -> {
+		
+		Runnable updateIncludeInfo = () -> {
 			if (pauseChanges) {
 				return;
 			}
 			int index = includesList.getSelectedIndex();
-			if (index != -1) {
+			SwanInclude inc = includesList.getSelectedValue();
+			if (index != -1 && inc != null) {
 				SwanSourceFile f = sourceFileList.getSelectedValue();
 				if (f != null) {
 					Object val = includeComboBox.getSelectedItem();
 					if (val != null) {
-						f.includes.setModify(index, String.valueOf(val));
+						inc.fileName = String.valueOf(val);
+						inc.priority = includeBeforeLocalTypedefs.isSelected() ? SwanInclude.PRIORITY_BEFORE_TYPEDEFS : SwanInclude.PRIORITY_NORMAL;
+						f.includes.setModify(index, inc);
 					}
 				}
 			}
-		});
+		};
+
+		includeComboBox.addListener((selectedItem) -> updateIncludeInfo.run());
+		includeBeforeLocalTypedefs.addActionListener((e) -> updateIncludeInfo.run());
 
 		btnAddRemoveInclude.addListener(new PlusMinusButtonSet.PMButtonListener() {
 			@Override
@@ -131,16 +137,17 @@ public class SwanComposer extends javax.swing.JFrame {
 				SwanSourceFile f = sourceFileList.getSelectedValue();
 				if (f != null) {
 					String newVal = "<not yet assigned>";
-					if (!f.includes.contains(newVal)) {
-						f.includes.add(newVal);
-						includesList.setSelectedValue(newVal, true);
+					if (f.getIncludeByFileName(newVal) == null) {
+						SwanInclude inc = new SwanInclude(newVal);
+						f.includes.add(inc);
+						includesList.setSelectedValue(inc, true);
 					}
 				}
 			}
 
 			@Override
 			public void minusClicked() {
-				String sel = includesList.getSelectedValue();
+				SwanInclude sel = includesList.getSelectedValue();
 				if (sel != null) {
 					sourceFileList.getSelectedValue().includes.remove(sel);
 				}
@@ -446,11 +453,13 @@ public class SwanComposer extends javax.swing.JFrame {
 
 	private void loadIncludeEntry() {
 		pauseChanges = true;
-		String incValue = includesList.getSelectedValue();
+		SwanInclude incValue = includesList.getSelectedValue();
 		if (incValue != null && db != null) {
-			includeComboBox.setSelectedItem(db.findFileByPath(incValue));
+			includeComboBox.setSelectedItem(db.findFileByPath(incValue.fileName));
+			includeBeforeLocalTypedefs.setSelected(incValue.priority == SwanInclude.PRIORITY_BEFORE_TYPEDEFS);
 		} else {
 			includeComboBox.setSelectedItem(null);
+			includeBeforeLocalTypedefs.setSelected(false);
 		}
 		pauseChanges = false;
 	}
@@ -606,6 +615,7 @@ public class SwanComposer extends javax.swing.JFrame {
         includeComboBox = new xstandard.gui.components.combobox.ACComboBox<>();
         btnAddRemoveInclude = new xstandard.gui.components.PlusMinusButtonSet();
         includeListLabel = new javax.swing.JLabel();
+        includeBeforeLocalTypedefs = new javax.swing.JCheckBox();
         typedefEditor = new javax.swing.JPanel();
         typedefTextArea = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         typedefsSP = new javax.swing.JScrollPane();
@@ -686,6 +696,8 @@ public class SwanComposer extends javax.swing.JFrame {
 
         includeListLabel.setText("List");
 
+        includeBeforeLocalTypedefs.setText("Before local typedefs");
+
         javax.swing.GroupLayout includeEditorLayout = new javax.swing.GroupLayout(includeEditor);
         includeEditor.setLayout(includeEditorLayout);
         includeEditorLayout.setHorizontalGroup(
@@ -700,7 +712,9 @@ public class SwanComposer extends javax.swing.JFrame {
                     .addGroup(includeEditorLayout.createSequentialGroup()
                         .addComponent(includesSP, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(includeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(includeEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(includeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(includeBeforeLocalTypedefs))))
                 .addContainerGap(280, Short.MAX_VALUE))
         );
         includeEditorLayout.setVerticalGroup(
@@ -714,8 +728,10 @@ public class SwanComposer extends javax.swing.JFrame {
                 .addGroup(includeEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(includeEditorLayout.createSequentialGroup()
                         .addComponent(includeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(includeBeforeLocalTypedefs)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(includesSP, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
+                    .addComponent(includesSP, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1305,9 +1321,9 @@ public class SwanComposer extends javax.swing.JFrame {
 
 					f.path = path;
 					for (SwanSourceFile f2 : db.sourceFiles) {
-						for (int i = 0; i < f2.includes.size(); i++) {
-							if (f2.includes.get(i).equals(oldPath)) {
-								f2.includes.set(i, path);
+						for (SwanInclude incl : f2.includes) {
+							if (incl.fileName.equals(oldPath)) {
+								incl.fileName = path;
 							}
 						}
 					}
@@ -1408,10 +1424,11 @@ public class SwanComposer extends javax.swing.JFrame {
     private javax.swing.JList<SwanTypedef> gvarList;
     private javax.swing.JLabel gvarListLabel;
     private javax.swing.JScrollPane gvarListSP;
+    private javax.swing.JCheckBox includeBeforeLocalTypedefs;
     private xstandard.gui.components.combobox.ACComboBox<SwanSourceFile> includeComboBox;
     private javax.swing.JPanel includeEditor;
     private javax.swing.JLabel includeListLabel;
-    private javax.swing.JList<String> includesList;
+    private javax.swing.JList<SwanInclude> includesList;
     private javax.swing.JScrollPane includesSP;
     private javax.swing.JLabel keyboardUsageComboLabel;
     private org.fife.ui.rsyntaxtextarea.RSyntaxTextArea macroArea;

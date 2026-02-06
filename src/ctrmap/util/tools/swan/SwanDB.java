@@ -28,6 +28,9 @@ public class SwanDB {
 	public SwanDB(FSFile fsf) {
 		yml = new Yaml(fsf);
 		YamlReflectUtil.deserializeToObject(yml.root, this);
+		for (SwanSourceFile file : sourceFiles) {
+			file.pullLegacyIncludes();
+		}
 	}
 	
 	public void sortSrcFiles() {

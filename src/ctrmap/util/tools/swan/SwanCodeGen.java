@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SwanCodeGen {
 
@@ -40,6 +41,8 @@ public class SwanCodeGen {
 			}
 		}
 		out.println();
+
+		printIncludes(out, src.includes, SwanInclude.PRIORITY_BEFORE_TYPEDEFS);
 
 		if (src.macros != null) {
 			String m = src.macros.trim();
@@ -131,12 +134,7 @@ public class SwanCodeGen {
 			}
 		}
 
-		if (!src.includes.isEmpty()) {
-			for (String incl : src.includes) {
-				out.println("#include \"" + incl + "\"");
-			}
-			out.println();
-		}
+		printIncludes(out, src.includes, SwanInclude.PRIORITY_NORMAL);
 
 		if (!src.functions.isEmpty()) {
 			out.println("C_DECL_BEGIN");
@@ -179,6 +177,19 @@ public class SwanCodeGen {
 		out.println("// Tchaikovsky code generator");
 
 		out.close();
+	}
+
+	private static void printIncludes(PrintStream out, List<SwanInclude> includes, int priority) {
+		boolean any = false;
+		for (SwanInclude incl : includes) {
+			if (incl.priority == priority) {
+				out.println("#include \"" + incl + "\"");
+				any = true;
+			}
+		}
+		if (any) {
+			out.println();
+		}
 	}
 
 	private static String makeEnumDef(String def) {
@@ -256,7 +267,7 @@ public class SwanCodeGen {
 		Map<String, String> cToCppNames = new HashMap<>();
 
 		for (SwanSourceFile f2 : db.sourceFiles) {
-			if (file.includes.contains(f2.path) || f2 == file) {
+			if (file.getIncludeByFileName(f2.path) != null || f2 == file) {
 				for (SwanStructure s2 : f2.structures) {
 					String cppName = s2.definition.cppName;
 					if (cppName != null && !cppName.trim().isEmpty()) {
@@ -301,6 +312,7 @@ public class SwanCodeGen {
 
 				boolean isReturn = !prototype.startsWith("void ");
 				List<String> args = getFuncArgs(m.cName, prototype);
+				Set<String> argsInCppPrototype = new HashSet<>();
 				int[] swizzleParams = m.getParamSwizzleIndices();
 				if (m.isStatic || isNs) {
 					bld.append(prototype.replace(m.cName, m.cppName));
@@ -325,8 +337,10 @@ public class SwanCodeGen {
 										} else {
 											bld.append(", ");
 										}
-										bld.append(args.get(sp - 1));
+										String arg = args.get(sp - 1);
+										bld.append(arg);
 										usedParams.add(sp);
+										argsInCppPrototype.add(arg);
 									}
 								}
 							}
@@ -348,21 +362,25 @@ public class SwanCodeGen {
 					if (i != 0) {
 						bld.append(", ");
 					}
-					int argIdx = i;
-					if (swizzleParams != null) {
-						argIdx = swizzleParams[i];
-					}
-					if (spExtra != null && spExtra[i] != null) {
-						bld.append(spExtra[i]);
+					if (argsInCppPrototype.contains(args.get(i))) {
+						bld.append(getArgName(args.get(i)));
 					} else {
-						if (argIdx == 0 && !(m.isStatic || isNs)) {
-							bld.append("this");
+						int argIdx = i;
+						if (swizzleParams != null) {
+							argIdx = swizzleParams[i];
+						}
+						if (spExtra != null && spExtra[i] != null) {
+							bld.append(spExtra[i]);
 						} else {
-							int idx = swizzleParams != null ? argIdx - 1 : argIdx;
-							if (idx >= 0 && idx < args.size()) {
-								bld.append(getArgName(args.get(idx)));
+							if (argIdx == 0 && !(m.isStatic || isNs)) {
+								bld.append("this");
 							} else {
-								bld.append("[OUT OF RANGE SWIZZLE: ").append(idx).append("]");
+								int idx = swizzleParams != null ? argIdx - 1 : argIdx;
+								if (idx >= 0 && idx < args.size()) {
+									bld.append(getArgName(args.get(idx)));
+								} else {
+									bld.append("[OUT OF RANGE SWIZZLE: ").append(idx).append("]");
+								}
 							}
 						}
 					}
