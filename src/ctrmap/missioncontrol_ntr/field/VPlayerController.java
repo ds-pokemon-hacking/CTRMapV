@@ -1,8 +1,6 @@
 package ctrmap.missioncontrol_ntr.field;
 
 import ctrmap.missioncontrol_base.InputManager;
-import java.util.ArrayList;
-import java.util.List;
 import ctrmap.formats.common.GameInfo;
 import xstandard.math.vec.Vec3f;
 import java.awt.Point;
@@ -10,7 +8,6 @@ import ctrmap.formats.pokemon.gen5.zone.entities.VNPC;
 import ctrmap.formats.pokemon.gen5.zone.entities.VWarp;
 import ctrmap.missioncontrol_base.debug.IMCDebuggable;
 import ctrmap.missioncontrol_ntr.VMcConfig;
-import ctrmap.missioncontrol_ntr.field.debug.VFieldDebugger;
 import ctrmap.missioncontrol_ntr.field.debug.VPlayerDebugger;
 import ctrmap.missioncontrol_ntr.field.mmodel.VMoveModel;
 import ctrmap.missioncontrol_ntr.field.structs.VZone;
@@ -33,14 +30,23 @@ public class VPlayerController implements VMcConfig.ConfigListener, IMCDebuggabl
 	public VPlayerController(VFieldController parent, NTRGameFS fs, GameInfo gm, VMcConfig config) {
 		this.parent = parent;
 		this.config = config;
-		playerMModel = new VMoveModel(parent, new VNPC(255, config.playerGender == PlayerGender.FEMALE ? 4 : 1));
 		game = gm;
 		modelFS = fs;
+		playerMModel = new VMoveModel(parent, new VNPC(255, getDefaultObjCode()));
 		onConfigUpdate();
 		config.addListener(this);
 		isInvertRun = config.isDefaultRun; //only set this on first config load, can be adjusted with CTRL
 
 		parent.mc.getDebuggerManager().registDebuggable(this);
+	}
+	
+	private int getDefaultObjCode() {
+		boolean girl = config.playerGender == PlayerGender.FEMALE;
+		if (game.isBW2()) {
+			return girl ? 240 : 231;
+		} else {
+			return girl ? 4 : 1;
+		}
 	}
 
 	private int currentMMdl;
