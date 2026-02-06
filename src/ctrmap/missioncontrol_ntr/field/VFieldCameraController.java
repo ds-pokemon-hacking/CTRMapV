@@ -167,6 +167,10 @@ public class VFieldCameraController implements IMCDebuggable<DebugCameraControll
 
 		return currentCoords;
 	}
+	
+	public float getActualPitch() {
+		return isUsingDebugCamera() ? -freeCamSrc.getDebugCamera().rotation.x : calcFixedCameraCoordinates().pitch;
+	}
 
 	@Override
 	public Class<DebugCameraController> getDebuggerClass() {

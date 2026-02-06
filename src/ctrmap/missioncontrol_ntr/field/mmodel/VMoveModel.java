@@ -28,6 +28,7 @@ import ctrmap.missioncontrol_ntr.field.VFieldController;
 import ctrmap.missioncontrol_ntr.fs.NARCRef;
 import ctrmap.renderer.scene.model.Joint;
 import ctrmap.renderer.scene.texturing.Texture;
+import xstandard.math.MathEx;
 
 public class VMoveModel extends ModelInstance implements VGridObject, IScriptObject {
 
@@ -48,7 +49,7 @@ public class VMoveModel extends ModelInstance implements VGridObject, IScriptObj
 	private VNPCRegistry.Entry regEntry;
 	private TextureMapper tm = null;
 	public VNPC NPCData;
-	
+
 	public VMoveModel(VFieldController controller, VNPC data) {
 		fieldController = controller;
 		NPCData = data;
@@ -356,7 +357,17 @@ public class VMoveModel extends ModelInstance implements VGridObject, IScriptObj
 			pos.set(p);
 		}
 		pos.add(regEntry.wPosOffX, regEntry.wPosOffY, regEntry.wPosOffZ);
+		if (!fieldController.camera.isUsingDebugCamera()) {
+			// for debug camera, do not use the offset so that models do not clip below the ground in ortho view
+			pos.y += calcBillboardYOffset();
+		}
 		return pos;
+	}
+
+	private float calcBillboardYOffset() {
+		// W2U OVL36:0x218136C
+		float pitch = fieldController.camera.getActualPitch();
+		return Math.max(-2f, ((float) Math.abs(Math.cos(MathEx.toRadiansf(pitch))) * 4f) - 4f);
 	}
 
 	@Override
