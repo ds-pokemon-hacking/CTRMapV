@@ -15,13 +15,13 @@ public class MapTileSearch {
 	public static void main(String[] args) {
 		FSFile mapFileDir = new DiskFile("D:\\_REWorkspace\\pokescript_genv\\00\\8");
 
-		int seekTileClass = 0xF;
+		int seekTileClass = 0x14;
 		int seekTileFlags = 0x100;
 
 		boolean seekFlags = false;
 
 		for (FSFile chunk : mapFileDir.listFiles()) {
-			GFContainer gfcont = new DefaultGamefreakContainer(chunk, "DM");
+			GFContainer gfcont = new DefaultGamefreakContainer(chunk);
 
 			MapTile mapTile = new MapTile();
 

@@ -196,12 +196,12 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 
 	public void forceFullReload() {
 		if (zone.header.areaID != area.id) {
-			loadArea(zone.header.areaID);
+			loadArea(resolveAreaId(zone.header.areaID));
 		} else {
 			area.forceFullReload(fs);
 		}
 		if (zone.header.matrixID != map.matrixId) {
-			loadMatrix(zone.header.matrixID);
+			loadMatrix(resolveMatrixID(zone.header.matrixID));
 		} else {
 			map.forceFullReload(fs);
 		}
@@ -244,13 +244,15 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 
 		monitor.setProgressPercentage(25);
 		monitor.setProgressSubTitle("Loading AreaData");
-		log.out("Loading area " + zone.header.areaID + " over " + area.id, "[AREA]", VMCModuleLogSource.FIELD);
-		boolean areaChange = zone.header.areaID != area.id;
-		loadArea(zone.header.areaID);
+		int resolvedAreaID = resolveAreaId(zone.header.areaID);
+		log.out("Loading area " + resolvedAreaID + " over " + area.id, "[AREA]", VMCModuleLogSource.FIELD);
+		boolean areaChange = resolvedAreaID != area.id;
+		loadArea(resolvedAreaID);
 
 		monitor.setProgressPercentage(50);
 		monitor.setProgressSubTitle("Loading world");
-		log.out("Loading map " + zone.header.matrixID + " over " + map.matrixId, "[WORLD]", VMCModuleLogSource.FIELD);
+		int resolvedMatrixID = resolveMatrixID(zone.header.matrixID);
+		log.out("Loading map " + resolvedMatrixID + " over " + map.matrixId, "[WORLD]", VMCModuleLogSource.FIELD);
 		if (isOmniMatrixLoad && !isOmniMatrixLoaded) {
 			int bldMax = fs.NARCGetDataMax(NARCRef.FIELD_BMODEL_BUNDLE_EXT);
 			for (int i = 0; i < bldMax; i++) {
@@ -258,8 +260,8 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 				area.bmReg.merge(blds);
 			}
 		}
-		boolean needsMapDebuggerForce = areaChange && zone.header.matrixID == map.matrixId && map.matrixZoneId != zoneId;
-		loadMatrix(zone.header.matrixID);
+		boolean needsMapDebuggerForce = areaChange && resolvedMatrixID == map.matrixId && map.matrixZoneId != zoneId;
+		loadMatrix(resolvedMatrixID);
 		if (needsMapDebuggerForce) {
 			map.reattachDebuggers();
 		}
@@ -332,11 +334,15 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 		System.gc();
 		log.out("Finished loading zone in " + (System.currentTimeMillis() - begin) + "ms.", "[ZONE]", VMCModuleLogSource.FIELD);
 	}
-
-	private void loadArea(int areaId) {
+	
+	private int resolveAreaId(int areaId) {
 		if (VArea.isAreaIdHasSeasons(areaId, game)) {
 			areaId += mc.season.ordinal();
 		}
+		return areaId;
+	}
+
+	private void loadArea(int areaId) {
 		if (areaId != area.id) {
 			area.free();
 			area = null;
@@ -383,7 +389,7 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 	}
 
 	private void loadMatrix(int matrixId) {
-		if (resolveMatrixID(matrixId) != map.matrixId) {
+		if (matrixId != map.matrixId) {
 			fieldScene.removeChild(map.worldScene);
 			map.free();
 			map = null;
@@ -392,6 +398,8 @@ public class VFieldController implements IMCDebuggable<VFieldDebugger> {
 			fieldScene.addScene(map.worldScene);
 		} else if (map.matrixZoneId != zone.id) {
 			map.changeZone(fs, zone);
+		} else {
+			map.updateMapReplace(fs);
 		}
 	}
 

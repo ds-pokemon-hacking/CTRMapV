@@ -28,6 +28,8 @@ import ctrmap.missioncontrol_ntr.field.map.BuildingInstance;
 import ctrmap.missioncontrol_ntr.field.map.VMapSamplerUtil;
 import ctrmap.missioncontrol_ntr.fs.NARCRef;
 import ctrmap.missioncontrol_ntr.fs.NTRGameFS;
+import java.util.ArrayList;
+import java.util.List;
 import xstandard.math.FAtan;
 import xstandard.math.vec.Vec3f;
 
@@ -46,6 +48,8 @@ public class VMap implements ICollisionProvider, IMCDebuggable<VMapDebugger> {
 	public VCameraDataFile cameras;
 
 	public ResizeableMatrix<GFContainer> chunks = new ResizeableMatrix<>(0, 0, null);
+	public ResizeableMatrix<Integer> actualChunkIDs = new ResizeableMatrix<>(0, 0, null);
+	public ResizeableMatrix<List<BuildingInstance>> chunkBuildings = new ResizeableMatrix<>(0, 0, null);
 
 	public ResizeableMatrix<ModelInstance> models = new ResizeableMatrix<>(0, 0, null);
 
@@ -149,6 +153,8 @@ public class VMap implements ICollisionProvider, IMCDebuggable<VMapDebugger> {
 		matrixZoneId = newMatrixZoneId;
 
 		chunks = new ResizeableMatrix<>(matrix.getWidth(), matrix.getHeight(), null);
+		actualChunkIDs = new ResizeableMatrix<>(matrix.getWidth(), matrix.getHeight(), null);
+		chunkBuildings = new ResizeableMatrix<>(matrix.getWidth(), matrix.getHeight(), new ArrayList<>());
 		//if (models == null) {
 		models = new ResizeableMatrix<>(matrix.getWidth(), matrix.getHeight(), null);
 		//}
@@ -162,47 +168,13 @@ public class VMap implements ICollisionProvider, IMCDebuggable<VMapDebugger> {
 		for (int x = 0; x < matrix.getWidth(); x++) {
 			for (int y = 0; y < matrix.getHeight(); y++) {
 				if (matrix.chunkIds.get(x, y) != -1) {
-					if (!ctrl.isOmniMatrixLoad && matrix.hasZones && matrix.zoneIds.get(x, y) != matrixZoneId) {
+					if (!ctrl.isOmniMatrixLoad && !isChunkInCurrentZone(x, y)) {
 						continue;
 					}
 					int baseChunkId = matrix.chunkIds.get(x, y);
 					int replacedChunkId = ctrl.resolveChunkID(matrixId, baseChunkId);
 
-					GFContainer source = new DefaultGamefreakContainer(fs.NARCGet(NARCRef.FIELD_MAP_CHUNKS, replacedChunkId));
-					chunks.set(x, y, source);
-
-					ModelInstance chunk = new NSBMD(source.getFile(MAPPACK_TERRAINMDL_IDX)).toGeneric().createInstance();
-
-					chunk.p.x = x * chunkSpan + chunkSpan / 2f;
-					chunk.p.z = y * chunkSpan + chunkSpan / 2f;
-
-					switch (source.getSignature()) {
-						case "WB":
-							terrain.set(x, y, new VMapTerrain(source.getFile(1)));
-							break;
-					}
-
-					ChunkBuildings blds = new ChunkBuildings(source.getFile(source.getFileCount() - 1));
-					for (ChunkBuilding bi : blds.buildings) {
-						bi.position.x += chunk.p.x;
-						bi.position.z = chunk.p.z - bi.position.z;
-						if (ctrl.isOmniMatrixLoad) {
-							BuildingInstance mainBld = new BuildingInstance(bi, ctrl.area.bmReg);
-							omniBld.mergeModelInst(mainBld);
-							if (mainBld.doorInstance != null) {
-								mainBld.doorInstance.p = mainBld.getPosition();
-								omniBld.mergeModelInst(mainBld.doorInstance);
-							}
-						} else {
-							buildings.add(new BuildingInstance(bi, ctrl.area.bmReg));
-						}
-					}
-
-					if (ctrl.isOmniMatrixLoad) {
-						omniChunk.mergeModelInst(chunk);
-					} else {
-						models.set(x, y, chunk);
-					}
+					loadChunkAt(fs, replacedChunkId, x, y);
 				}
 			}
 		}
@@ -215,6 +187,86 @@ public class VMap implements ICollisionProvider, IMCDebuggable<VMapDebugger> {
 		ctrl.mc.getDebuggerManager().registDebuggable(this);
 
 		buildScene();
+	}
+	
+	private boolean isChunkInCurrentZone(int x, int y) {
+		return !matrix.hasZones || matrix.zoneIds.get(x, y) == matrixZoneId;
+	}
+
+	private void loadChunkAt(NTRGameFS fs, int chunkId, int x, int y) {
+		GFContainer source = new DefaultGamefreakContainer(fs.NARCGet(NARCRef.FIELD_MAP_CHUNKS, chunkId));
+		chunks.set(x, y, source);
+		actualChunkIDs.set(x, y, chunkId);
+
+		ModelInstance chunk = new NSBMD(source.getFile(MAPPACK_TERRAINMDL_IDX)).toGeneric().createInstance();
+
+		chunk.p.x = x * chunkSpan + chunkSpan / 2f;
+		chunk.p.z = y * chunkSpan + chunkSpan / 2f;
+
+		switch (source.getSignature()) {
+			case "WB":
+				terrain.set(x, y, new VMapTerrain(source.getFile(1)));
+				break;
+		}
+
+		ChunkBuildings blds = new ChunkBuildings(source.getFile(source.getFileCount() - 1));
+		List<BuildingInstance> buildingList = new ArrayList<>();
+		for (ChunkBuilding bi : blds.buildings) {
+			bi.position.x += chunk.p.x;
+			bi.position.z = chunk.p.z - bi.position.z;
+			if (ctrl.isOmniMatrixLoad) {
+				BuildingInstance mainBld = new BuildingInstance(bi, ctrl.area.bmReg);
+				omniBld.mergeModelInst(mainBld);
+				if (mainBld.doorInstance != null) {
+					mainBld.doorInstance.p = mainBld.getPosition();
+					omniBld.mergeModelInst(mainBld.doorInstance);
+				}
+			} else {
+				buildingList.add(new BuildingInstance(bi, ctrl.area.bmReg));
+			}
+		}
+		if (!ctrl.isOmniMatrixLoad) {
+			buildings.addAll(buildingList);
+		}
+		chunkBuildings.set(x, y, buildingList);
+
+		if (ctrl.isOmniMatrixLoad) {
+			omniChunk.mergeModelInst(chunk);
+		} else {
+			models.set(x, y, chunk);
+		}
+	}
+	
+	private void unloadChunkAt(int x, int y) {
+		chunks.set(x, y, null);
+		actualChunkIDs.set(x, y, null);
+		terrain.set(x, y, null);
+		models.set(x, y, null);
+		buildings.removeAll(chunkBuildings.get(x, y));
+		chunkBuildings.set(x, y, null);
+	}
+
+	public void updateMapReplace(NTRGameFS fs) {
+		boolean changed = false;
+		for (int x = 0; x < matrix.getWidth(); x++) {
+			for (int y = 0; y < matrix.getHeight(); y++) {
+				if (matrix.chunkIds.get(x, y) != -1 && isChunkInCurrentZone(x, y)) {
+					Integer oldChunkId = actualChunkIDs.get(x, y);
+					int baseChunkId = matrix.chunkIds.get(x, y);
+					int newChunkId = ctrl.resolveChunkID(matrixId, baseChunkId);
+
+					if (oldChunkId == null || oldChunkId != newChunkId) {
+						unloadChunkAt(x, y);
+						loadChunkAt(fs, newChunkId, x, y);
+						changed = true;
+					}
+				}
+			}
+		}
+		if (changed) {
+			buildScene();
+			reattachDebuggers();
+		}
 	}
 
 	private void buildScene() {
