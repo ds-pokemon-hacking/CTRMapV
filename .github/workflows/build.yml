@@ -1,0 +1,44 @@
+name: Build CTRMapV
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout CTRMapV
+        uses: actions/checkout@v4
+        with:
+          path: CTRMapV
+
+      - name: Checkout CTRMap-CE
+        uses: actions/checkout@v4
+        with:
+          repository: ds-pokemon-hacking/CTRMap-CE
+          path: CTRMap-CE
+          submodules: recursive
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build CTRMap-CE
+        run: cd CTRMap-CE && mvn install -B
+
+      - name: Build CTRMapV
+        run: cd CTRMapV && mvn package -B
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTRMapV
+          path: CTRMapV/target/ctrmapv-*.jar
+          if-no-files-found: warn
