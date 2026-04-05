@@ -16,6 +16,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <ctrmap.version>1.0-SNAPSHOT</ctrmap.version>
+        <build.date>local</build.date>
+        <build.commit>unknown</build.commit>
+        <build.type>dev</build.type>
     </properties>
 
     <repositories>
@@ -124,6 +127,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}-${build.type}-${build.date}-${build.commit}</finalName>
         <sourceDirectory>src</sourceDirectory>
         <resources>
             <resource>
