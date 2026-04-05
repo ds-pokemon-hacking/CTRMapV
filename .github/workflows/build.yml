@@ -2,9 +2,9 @@ name: Build CTRMapV
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, maven ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, maven ]
 
 jobs:
   build:
@@ -19,7 +19,8 @@ jobs:
       - name: Checkout CTRMap-CE
         uses: actions/checkout@v4
         with:
-          repository: ds-pokemon-hacking/CTRMap-CE
+          repository: PlatinumMaster/CTRMap-CE
+          ref: maven
           path: CTRMap-CE
           submodules: recursive
 
