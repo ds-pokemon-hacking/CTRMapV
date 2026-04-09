@@ -139,6 +139,8 @@ public class SwanTypedef {
 	public static String sanitizeCodeBlock(String block) {
 		block = block.trim(); //trims newlines at end
 		block = block.replace("__fastcall ", ""); //GCC does not like this
+		block = block.replace("__bitmask ", ""); //IDA macro
+		block = block.replaceAll(" *: *__int[0-9]+", ""); // enum : __int32 (IDA)
 		block = block.replace(" **", "** ");
 		block = block.replace(" *", "* "); //char *stuff to char* stuff
 		block = block.replace(" ,", ",");
