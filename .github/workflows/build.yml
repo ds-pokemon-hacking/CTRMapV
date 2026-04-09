@@ -2,9 +2,9 @@ name: Build CTRMapV
 
 on:
   push:
-    branches: [main, master, maven]
+    branches: [main, master]
   pull_request:
-    branches: [main, master, maven]
+    branches: [main, master]
 
 permissions:
   contents: write
@@ -22,8 +22,8 @@ jobs:
       - name: Checkout CTRMap-CE
         uses: actions/checkout@v4
         with:
-          repository: PlatinumMaster/CTRMap-CE
-          ref: maven
+          repository: ds-pokemon-hacking/CTRMap-CE
+          ref: master
           path: CTRMap-CE
           submodules: recursive
 
@@ -33,6 +33,9 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+
+      - name: Build CTRMap-CE dependency chain
+        run: bash CTRMap-CE/ci/build/build-all-for-downstream.sh
 
       - name: Set build metadata
         id: meta
@@ -48,9 +51,6 @@ jobs:
           echo "commit=$COMMIT" >> $GITHUB_OUTPUT
           echo "type=$TYPE" >> $GITHUB_OUTPUT
 
-      - name: Build CTRMap-CE
-        run: cd CTRMap-CE && mvn install -B
-
       - name: Build CTRMapV
         run: cd CTRMapV && mvn package -B -Dbuild.date=${{ steps.meta.outputs.date }} -Dbuild.commit=${{ steps.meta.outputs.commit }} -Dbuild.type=${{ steps.meta.outputs.type }}
 
@@ -60,29 +60,3 @@ jobs:
           name: CTRMapV
           path: CTRMapV/target/ctrmapv-*.jar
           if-no-files-found: warn
-
-      - name: Create Nightly Release
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd CTRMapV
-          gh release delete nightly --yes 2>/dev/null || true
-          git push origin :refs/tags/nightly 2>/dev/null || true
-          gh release create nightly \
-            --title "Nightly ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.commit }})" \
-            --notes "Dev build from \`${{ steps.meta.outputs.commit }}\` on $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
-            --prerelease \
-            target/ctrmapv-*.jar
-
-      - name: Create Stable Release
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd CTRMapV
-          TAG="stable-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.commit }}"
-          gh release create "$TAG" \
-            --title "Stable ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.commit }})" \
-            --notes "Stable release from \`${{ steps.meta.outputs.commit }}\` on $(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
-            target/ctrmapv-*.jar

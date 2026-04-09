@@ -21,17 +21,6 @@
         <build.type>nightly</build.type>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jogamp</id>
-            <url>https://jogamp.org/deployment/maven</url>
-        </repository>
-        <repository>
-            <id>frankenjfx-local</id>
-            <url>file://${project.basedir}/../CTRMap-CE/submodules/XStandard/lib/repo</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>ctrmap</groupId>
@@ -39,102 +28,14 @@
             <version>${ctrmap.version}</version>
         </dependency>
         <dependency>
-            <groupId>ctrmap</groupId>
+            <groupId>com.github.hello007</groupId>
             <artifactId>xstandard</artifactId>
             <version>${ctrmap.version}</version>
         </dependency>
         <dependency>
-            <groupId>ctrmap</groupId>
+            <groupId>com.github.hello007</groupId>
             <artifactId>rpm-authoring-tools</artifactId>
             <version>${ctrmap.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ctrmap</groupId>
-            <artifactId>pokescript</artifactId>
-            <version>${ctrmap.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ctrmap</groupId>
-            <artifactId>pokescript-ide</artifactId>
-            <version>${ctrmap.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-windows-amd64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-linux-amd64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-linux-aarch64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-macosx-universal</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-windows-amd64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-linux-amd64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-linux-aarch64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>2.4.0</version>
-            <classifier>natives-macosx-universal</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml</artifactId>
-            <version>1.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.frankenjfx</groupId>
-            <artifactId>frankenjfx</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.frankenjfx</groupId>
-            <artifactId>frankenjfx-natives-win32</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fifesoft</groupId>
-            <artifactId>rsyntaxtextarea</artifactId>
-            <version>3.1.3</version>
         </dependency>
     </dependencies>
 
@@ -154,7 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.15.0</version>
             </plugin>
         </plugins>
     </build>
